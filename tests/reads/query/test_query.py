@@ -10,7 +10,7 @@ import asyncio
 
 from reads.fetch.async_fetch import AsyncReadFetcher
 from reads.query.async_query import AsyncQuery
-from test.dev_server import DevelopmentServer
+from tests.dev_server import DevelopmentServer
 
 
 class TestQuery:

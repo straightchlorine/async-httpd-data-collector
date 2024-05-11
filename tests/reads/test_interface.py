@@ -9,10 +9,9 @@ import json
 
 import pytest
 
-from test.reads.query.test_query import TestQuery
 from reads.interface import DatabaseInterface
-from test.dev_server import DevelopmentServer
-
+from tests.dev_server import DevelopmentServer
+from tests.reads.query.test_query import TestQuery
 
 
 class TestInterface:
@@ -61,17 +60,22 @@ class TestInterface:
             secrets["handle"],
         )
 
-        # needs to ba called directly because of the running loop
-        asyncio.create_task(self.interface._fetcher._fetching_loop())
+        self.interface.enable_fetching()
 
     @pytest.mark.asyncio
     async def test_fetcher(self):
+        """
+        Test the fetcher object.
+        """
         self.set_up()
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
         assert 1 == 1
 
     @pytest.mark.asyncio
     async def test_latest(self):
+        """
+        Test the latest query.
+        """
         self.set_up()
         await asyncio.sleep(2)
         result = await self.interface.query_latest()
@@ -79,10 +83,12 @@ class TestInterface:
 
     @pytest.mark.asyncio
     async def test_historical(self):
+        """
+        Test the historical query.
+        """
         self.set_up()
         await asyncio.sleep(2)
         result = await self.interface.query_historical(
             "2024-05-05T18:00:00Z", "2024-05-05T21:00:00Z"
         )
-        print(result)
-        # assert TestQuery.verify_vals(result.values.tolist()[0])
+        assert not result.empty

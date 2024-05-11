@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 
 from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
-
 import pandas as pd
 
 
