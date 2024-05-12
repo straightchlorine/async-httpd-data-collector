@@ -12,6 +12,8 @@ import aiohttp
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 from influxdb_client.client.write.point import Point
 
+__all__ = ["AsyncReadFetcher"]
+
 
 class AsyncReadFetcher:
     """

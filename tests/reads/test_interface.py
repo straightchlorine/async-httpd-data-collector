@@ -9,7 +9,7 @@ import json
 
 import pytest
 
-from reads.interface import DatabaseInterface
+from ahttpdc.reads.interface import DatabaseInterface
 from tests.dev_server import DevelopmentServer
 from tests.reads.query.test_query import TestQuery
 

@@ -7,18 +7,12 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 import asyncio
 import json
 import multiprocessing
-from pathlib import Path
-import sys
 
 from dash import Dash, Input, Output, callback, dcc, html
 import pandas as pd
 
-path_root = Path(__file__).parents[2]
-sys.path.append(str(path_root))
-
-from reads.interface import DatabaseInterface
+from ahttpdc.reads.interface import DatabaseInterface
 from tests.dev_server import DevelopmentServer
-
 
 # start the test server and specifiy the IP and port
 DevelopmentServer().run_test_server()

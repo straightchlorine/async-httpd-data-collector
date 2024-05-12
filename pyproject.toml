@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+authors = [
+  {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
+]
+mantainers = [
+  {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
+]
+description = "Gateway facilitating seamless communication between sensory data-emitting devices and InfluxDB. Manages asynchronous fetching JSON format data, querying, and storage operations."
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ['async', 'http', 'data', 'collector', 'influxdb', 'nodemcu', 'arduino', 'sensors', 'json']
+dynamic = ["version"]
+name = "async-httpd-data-collector"
+requires-python = ">=3.8"
+dependencies = [
+  "influxdb-client[async]",
+  "reactivex",
+  "certifi",
+  "python-dateutil",
+  "setuptools",
+  "urllib3",
+  "aiohttp",
+  "aiocsv",
+  "typing_extensions",
+  "aiosignal",
+  "attrs",
+  "frozenlist",
+  "multidict",
+  "yarl",
+  "six",
+  "idna",
+  "pandas",
+  "numpy",
+  "pytz",
+  "tzdata",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Topic :: Database",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Programming Language :: Python :: 3",
+
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-asyncio",
+  "iniconfig",
+  "pluggy",
+  "dash",
+  "Flask",
+  "Werkzeug",
+  "plotly",
+  "dash-html-components",
+  "dash-core-components",
+  "dash-table",
+  "importlib_metadata",
+  "requests",
+  "retrying",
+  "Jinja2",
+  "nest-asyncio",
+  "itsdangerous",
+  "click",
+  "blinker",
+  "tenacity",
+  "MarkupSafe",
+  "packaging",
+  "zipp",
+  "charset-normalizer",
+]
+
+
+[project.urls]
+Repository = "https://github.com/straightchlorine/async-httpd-data-collector"
+Issues = "https://github.com/straightchlorine/async-httpd-data-collector/issues"
+
+[tool.hatch.version]
+path = "ahttpdc/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ahttpdc"]
