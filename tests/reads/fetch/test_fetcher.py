@@ -4,16 +4,13 @@ Test class for AsyncReadFetcher.
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
-Author: Piotr Krzysztof Lis - github.com/straightchlorine
-"""
-
 import asyncio
 import json
 
 import pytest
 
 from reads.fetch.async_fetch import AsyncReadFetcher
-from test.dev_server import DevelopmentServer
+from tests.dev_server import DevelopmentServer
 
 
 class TestFetcher:

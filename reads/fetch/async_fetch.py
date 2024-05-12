@@ -8,10 +8,9 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 import asyncio
 import datetime
 
+import aiohttp
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 from influxdb_client.client.write.point import Point
-
-import aiohttp
 
 
 class AsyncReadFetcher:

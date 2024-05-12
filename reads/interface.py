@@ -5,13 +5,32 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import asyncio
+import multiprocessing
 
 import pandas as pd
+
 from reads.fetch.async_fetch import AsyncReadFetcher
 from reads.query.async_query import AsyncQuery
 
 
 class DatabaseInterface:
+    """
+    Interface to control fetching, writing and querying from the database.
+
+    Attributes:
+        _influxdb_host (str): The host of the InfluxDB instance.
+        _influxdb_port (int): The port of the InfluxDB instance.
+        _influxdb_token (str): The token to authenticate with InfluxDB.
+        _influxdb_organization (str): The organization to use within InfluxDB.
+        _influxdb_bucket (str): Bucket within InfluxDB where the data will be stored.
+        _dev_ip (str): The IP address of device providing sensor readings.
+        _dev_port (str): The port of the device providing the readings.
+        _dev_handle (str): The http handle to access the data.
+        _dev_url (str): The address of the device in the network.
+        _db_url (str): The address of the influxdb instance.
+        sensors (dict): The sensors and their parameters to read.
+    """
+
     _influxdb_host: str  # host of the influxdb instance
     _influxdb_port: int  # port of the influxdb instance
     _influxdb_token: str  # token to authenticate with influxdb
@@ -87,7 +106,13 @@ class DatabaseInterface:
         in order to avoid blocking the main thread.
         """
 
-        asyncio.run(self._fetcher.schedule_fetcher())
+        def _start_fetching():
+            asyncio.run(self._fetcher.schedule_fetcher())
+
+        fetching_process = multiprocessing.Process(
+            target=_start_fetching, name="asyncfetcher"
+        )
+        fetching_process.start()
 
     async def query_latest(self) -> pd.DataFrame:
         """
@@ -114,6 +139,7 @@ class DatabaseInterface:
         Returns:
             pd.DataFrame: Historical data within the specified time range.
         """
+
         print("<.> querying historical data...")
         query_task = asyncio.create_task(
             self.query_interface.historical_data(start, end)
@@ -132,6 +158,7 @@ class DatabaseInterface:
         Returns:
             pd.DataFrame: The result of the custom query.
         """
+
         print("<.> custom query...")
         query_task = asyncio.create_task(self.query_interface.query(query))
         await query_task
