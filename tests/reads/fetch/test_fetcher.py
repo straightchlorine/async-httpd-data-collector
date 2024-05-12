@@ -9,7 +9,7 @@ import json
 
 import pytest
 
-from reads.fetch.async_fetch import AsyncReadFetcher
+from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
 from tests.dev_server import DevelopmentServer
 
 

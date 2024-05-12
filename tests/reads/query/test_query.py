@@ -8,8 +8,8 @@ import pytest
 import json
 import asyncio
 
-from reads.fetch.async_fetch import AsyncReadFetcher
-from reads.query.async_query import AsyncQuery
+from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
+from ahttpdc.reads.query.async_query import AsyncQuery
 from tests.dev_server import DevelopmentServer
 
 
