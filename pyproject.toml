@@ -9,7 +9,7 @@ authors = [
 mantainers = [
   {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
 ]
-description = "Gateway facilitating seamless communication between sensory data-emitting devices and InfluxDB. Manages asynchronous fetching JSON format data, querying, and storage operations."
+description = "Gateway facilitating asyncronous communication between sensory data-emitting devices, InfluxDB and the user."
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = ['async', 'http', 'data', 'collector', 'influxdb', 'nodemcu', 'arduino', 'sensors', 'json']
