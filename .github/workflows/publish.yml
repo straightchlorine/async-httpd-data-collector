@@ -25,6 +25,7 @@ jobs:
 
     - name: Lint with ruff
       run: |
+        ruff format
         ruff check
 
     # omitting the testing for now
