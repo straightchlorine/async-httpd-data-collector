@@ -4,13 +4,14 @@ Test class for AsyncQuery.
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
-import pytest
-import json
 import asyncio
+from datetime import datetime, timedelta
+import os
+import multiprocessing
+import pytest
 
 from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
 from ahttpdc.reads.query.async_query import AsyncQuery
-from tests.dev_server import DevelopmentServer
 
 
 class TestQuery:
@@ -33,45 +34,56 @@ class TestQuery:
     query: AsyncQuery
 
     def set_up(self):
-        # start the test server and specifiy the IP and port
-        DevelopmentServer().run_test_server()
-        self.test_dev_ip = "localhost"
-        self.test_dev_port = 5000
+        """
+        Set up the testing environment.
+        """
 
-        # load the secrets
-        with open("secrets/secrets.json", "r") as f:
-            secrets = json.load(f)
+        self.dbhost = os.getenv('INFLUXDB_HOST')
+        self.dbport = os.getenv('INFLUXDB_PORT')
 
-        # list of sensors and their parameters
+        self.dbtoken = os.getenv('INFLUXDB_TOKEN')
+        self.dborg = os.getenv('INFLUXDB_ORG')
+        self.dbbudket = os.getenv('INFLUXDB_BUCKET')
+
+        self.test_dev_ip = 'localhost'
+        self.test_dev_port = 9000
+        self.handle = 'circumstances'
+
+        # list of sensors to fetch and their parameters
         sensors = {
-            "bmp180": ["altitude", "pressure", "temperature", "seaLevelPressure"],
-            "mq135": ["aceton", "alcohol", "co", "co2", "nh4", "toulen"],
+            'bmp180': ['altitude', 'pressure', 'temperature', 'seaLevelPressure'],
+            'mq135': ['aceton', 'alcohol', 'co', 'co2', 'nh4', 'toulen'],
         }
 
         # create the AcyncReadFetcher object
         self.fetcher = AsyncReadFetcher(
-            secrets["host"],
-            secrets["port"],
-            secrets["token"],
-            secrets["organization"],
-            secrets["bucket"],
+            self.dbhost,
+            self.dbport,
+            self.dbtoken,
+            self.dborg,
+            self.dbbudket,
             sensors,
             self.test_dev_ip,
             self.test_dev_port,
-            secrets["handle"],
+            self.handle,
         )
 
         self.query = AsyncQuery(
-            secrets["host"],
-            secrets["port"],
-            secrets["token"],
-            secrets["organization"],
-            secrets["bucket"],
+            self.dbhost,
+            self.dbport,
+            self.dbtoken,
+            self.dborg,
+            self.dbbudket,
             sensors,
         )
 
-        # needs to ba called directly because of the running loop
-        asyncio.create_task(self.fetcher._fetching_loop())
+        def _start_fetching():
+            asyncio.run(self.fetcher.schedule_fetcher())
+
+        self.fetching_process = multiprocessing.Process(
+            target=_start_fetching, name='asyncfetcher'
+        )
+        self.fetching_process.start()
 
     @staticmethod
     def verify_vals(to_verify):
@@ -83,6 +95,7 @@ class TestQuery:
         Returns:
             bool: True if the values are correct, False otherwise.
         """
+
         values = [2.57, 6.62, 149.56, 28.88, 412.1, 15.12, 998.42, 1016.34, 26.0, 3.14]
 
         index = 0
@@ -100,12 +113,16 @@ class TestQuery:
         """
         Test the latest() method of the AsyncQuery class.
         """
+
         self.set_up()
 
         # wait for some readings
-        await asyncio.sleep(2)
-
+        await asyncio.sleep(4)
         result = await self.query.latest()
+
+        self.fetching_process.terminate()
+        self.fetching_process.join()
+
         assert self.verify_vals(result.values.tolist()[0])
 
     @pytest.mark.asyncio
@@ -113,9 +130,19 @@ class TestQuery:
         """
         Test the historical_data() method of the AsyncQuery class.
         """
+
         self.set_up()
 
+        # wait for some readings
+        await asyncio.sleep(5)
+
+        finish = datetime.now()
+        start = finish - timedelta(seconds=4)
         result = await self.query.historical_data(
-            "2024-05-05T18:00:00Z", "2024-05-05T21:00:00Z"
+            start.strftime('%Y-%m-%dT%H:%M:%SZ'), finish.strftime('%Y-%m-%dT%H:%M:%SZ')
         )
+
+        self.fetching_process.terminate()
+        self.fetching_process.join()
+
         assert not result.empty

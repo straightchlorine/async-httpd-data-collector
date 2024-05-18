@@ -5,12 +5,13 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import asyncio
-import json
+import os
 
 import pytest
 
 from ahttpdc.reads.interface import DatabaseInterface
-from tests.dev_server import DevelopmentServer
+from datetime import datetime, timedelta
+
 from tests.reads.query.test_query import TestQuery
 
 
@@ -32,32 +33,38 @@ class TestInterface:
     test_dev_port: int
 
     def set_up(self):
-        # start the test server and specifiy the IP and port
-        DevelopmentServer().run_test_server()
-        self.test_dev_ip = "localhost"
-        self.test_dev_port = 5000
+        """
+        Setting up the testing environment.
+        """
 
-        # load the secrets
-        with open("secrets/secrets.json", "r") as f:
-            secrets = json.load(f)
+        self.dbhost = os.getenv('INFLUXDB_HOST')
+        self.dbport = os.getenv('INFLUXDB_PORT')
+
+        self.dbtoken = os.getenv('INFLUXDB_TOKEN')
+        self.dborg = os.getenv('INFLUXDB_ORG')
+        self.dbbudket = os.getenv('INFLUXDB_BUCKET')
+
+        self.test_dev_ip = 'localhost'
+        self.test_dev_port = 9000
+        self.handle = 'circumstances'
 
         # list of sensors and their parameters
         sensors = {
-            "bmp180": ["altitude", "pressure", "temperature", "seaLevelPressure"],
-            "mq135": ["aceton", "alcohol", "co", "co2", "nh4", "toulen"],
+            'bmp180': ['altitude', 'pressure', 'temperature', 'seaLevelPressure'],
+            'mq135': ['aceton', 'alcohol', 'co', 'co2', 'nh4', 'toulen'],
         }
 
         # create InfluxDBInterface object
         self.interface = DatabaseInterface(
-            secrets["host"],
-            secrets["port"],
-            secrets["token"],
-            secrets["organization"],
-            secrets["bucket"],
+            self.dbhost,
+            self.dbport,
+            self.dbtoken,
+            self.dborg,
+            self.dbbudket,
             sensors,
             self.test_dev_ip,
             self.test_dev_port,
-            secrets["handle"],
+            self.handle,
         )
 
         self.interface.enable_fetching()
@@ -65,20 +72,27 @@ class TestInterface:
     @pytest.mark.asyncio
     async def test_fetcher(self):
         """
-        Test the fetcher object.
+        Test the fetcher object, just check if it runs.
         """
+
         self.set_up()
         await asyncio.sleep(2)
-        assert 1 == 1
+
+        self.interface.disable_fetching()
+        assert True
 
     @pytest.mark.asyncio
     async def test_latest(self):
         """
         Test the latest query.
         """
+
         self.set_up()
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
+
         result = await self.interface.query_latest()
+        self.interface.disable_fetching()
+
         assert TestQuery.verify_vals(result.values.tolist()[0])
 
     @pytest.mark.asyncio
@@ -86,9 +100,15 @@ class TestInterface:
         """
         Test the historical query.
         """
+
         self.set_up()
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
+
+        finish = datetime.now()
+        start = finish - timedelta(seconds=4)
         result = await self.interface.query_historical(
-            "2024-05-05T18:00:00Z", "2024-05-05T21:00:00Z"
+            start.strftime('%Y-%m-%dT%H:%M:%SZ'), finish.strftime('%Y-%m-%dT%H:%M:%SZ')
         )
+        self.interface.disable_fetching()
+
         assert not result.empty

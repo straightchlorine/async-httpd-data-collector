@@ -5,12 +5,13 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import asyncio
-import json
+import os
+import multiprocessing
 
 import pytest
 
 from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
-from tests.dev_server import DevelopmentServer
+# from tests.dev_server import DevelopmentServer
 
 
 class TestFetcher:
@@ -18,38 +19,60 @@ class TestFetcher:
     test_dev_port: int
 
     def set_up(self):
-        # start the test server
-        DevelopmentServer().run_test_server()
+        """
+        Set up the testing environment.
+        """
 
-        # load the secrets
-        with open("secrets/secrets.json", "r") as f:
-            secrets = json.load(f)
+        self.dbhost = os.getenv('INFLUXDB_HOST')
+        self.dbport = os.getenv('INFLUXDB_PORT')
 
-        # test server simulating the device
-        self.test_dev_ip = "localhost"
-        self.test_dev_port = 5000
+        self.dbtoken = os.getenv('INFLUXDB_TOKEN')
+        self.dborg = os.getenv('INFLUXDB_ORG')
+        self.dbbudket = os.getenv('INFLUXDB_BUCKET')
 
+        self.test_dev_ip = 'localhost'
+        self.test_dev_port = 9000
+        self.handle = 'circumstances'
+
+        # list of sensors to fetch and their paramters
         sensors = {
-            "bmp180": ["altitude", "pressure", "temperature", "seaLevelPressure"],
-            "mq135": ["aceton", "alcohol", "co", "co2", "nh4", "toulen"],
+            'bmp180': ['altitude', 'pressure', 'temperature', 'seaLevelPressure'],
+            'mq135': ['aceton', 'alcohol', 'co', 'co2', 'nh4', 'toulen'],
         }
 
         # create the AcyncReadFetcher object
         self.fetcher = AsyncReadFetcher(
-            secrets["host"],
-            secrets["port"],
-            secrets["token"],
-            secrets["organization"],
-            secrets["bucket"],
+            self.dbhost,
+            self.dbport,
+            self.dbtoken,
+            self.dborg,
+            self.dbbudket,
             sensors,
             self.test_dev_ip,
             self.test_dev_port,
-            secrets["handle"],
+            self.handle,
         )
 
     @pytest.mark.asyncio
     async def test_query(self):
+        """
+        Testing the fetcher, if works, it works.
+        """
+
         self.set_up()
-        asyncio.create_task(self.fetcher.schedule_fetcher())
+
+        def _start_fetching():
+            asyncio.run(self.fetcher.schedule_fetcher())
+
+        fetching_process = multiprocessing.Process(
+            target=_start_fetching, name='asyncfetcher'
+        )
+        fetching_process.start()
+
+        # let it work for some time
         await asyncio.sleep(2)
+
+        fetching_process.terminate()
+        fetching_process.join()
+
         assert 1 == 1
