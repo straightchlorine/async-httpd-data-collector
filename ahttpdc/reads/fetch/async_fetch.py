@@ -12,7 +12,7 @@ import aiohttp
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 from influxdb_client.client.write.point import Point
 
-__all__ = ["AsyncReadFetcher"]
+__all__ = ['AsyncReadFetcher']
 
 
 class AsyncReadFetcher:
@@ -25,7 +25,7 @@ class AsyncReadFetcher:
         _influxdb_port (int): The port of the InfluxDB instance.
         _influxdb_token (str): The token to authenticate with InfluxDB.
         _influxdb_organization (str): The organization to use within InfluxDB.
-        _influxdb_bucket (str): Bucket within InfluxDB where the data will be stored.
+        _influxdb_bucket (str): InfluxDB bucket where the data will be stored.
         _device_ip (str): The IP address of device providing sensor readings.
         _device_port (str): The port of the device providing the readings.
         _http_handle (str): The http handle to access the data.
@@ -48,7 +48,7 @@ class AsyncReadFetcher:
     _db_url: str  # address of the influxdb instance
 
     def __init__(
-        self, host, port, token, org, bucket, sensors, dev_ip, dev_port, handle=""
+        self, host, port, token, org, bucket, sensors, dev_ip, dev_port, handle=''
     ):
         """
         Initialize the fetcher with the required information.
@@ -78,12 +78,12 @@ class AsyncReadFetcher:
         self._dev_handle = handle
 
         # device and database URLs
-        self._dev_url = f"http://{self._dev_ip}:{self._dev_port}/{self._dev_handle}"
-        self._db_url = f"http://{self._influxdb_host}:{self._influxdb_port}"
+        self._dev_url = f'http://{self._dev_ip}:{self._dev_port}/{self._dev_handle}'
+        self._db_url = f'http://{self._influxdb_host}:{self._influxdb_port}'
 
         self._sensors = sensors
 
-    def _get_reads(self, data) -> dict[str, float]:
+    def _get_reads(self, data, device) -> dict[str, float]:
         """
         Based on sensors specified in sensors attribute fill the fields
         with appropriate key-value pairs for InfluxDB storage.
@@ -95,10 +95,19 @@ class AsyncReadFetcher:
         fields = {}
         for sensor in self._sensors:
             for param in self._sensors[sensor]:
-                fields[param] = float(data["nodemcu"][sensor][param])
+                if param not in fields:
+                    fields[param] = float(data[device][sensor][param])
+                else:
+                    # if the measurement already has been recorded, calculate
+                    # the average of the measurements
+                    previous = fields[param]
+                    current = float(data[device][sensor][param])
+                    average = (previous + current) / 2
+                    fields[param] = average
+
         return fields
 
-    def _parse_into_records(self, data, device_name="nodemcu"):
+    def _parse_into_records(self, data):
         """
         Parse raw json file into records for InfluxDB.
 
@@ -107,13 +116,14 @@ class AsyncReadFetcher:
             device_name (str): The name of the device (default is 'nodemcu').
         """
 
+        device = list(data.keys())[0]
         records = {
-            "measurement": "sensor_data",
-            "tags": {"device": device_name},
-            "timestamp": str(datetime.datetime.now()),
+            'measurement': 'sensor_data',
+            'tags': {'device': device},
+            'timestamp': str(datetime.datetime.now()),
         }
 
-        records["fields"] = self._get_reads(data)
+        records['fields'] = self._get_reads(data, device)
         return records
 
     async def _write_to_db(self, client, record):
@@ -125,9 +135,9 @@ class AsyncReadFetcher:
             records (dict): The sensor readings as records for InfluxDB.
         """
 
-        print("<.> writing new read into database...")
+        print('<.> writing new read into database...')
         write_api = client.write_api()
-        point = Point.from_dict(record, write_precision="ns")
+        point = Point.from_dict(record, write_precision='ns')
         await write_api.write(
             bucket=self._influxdb_bucket, org=self._influxdb_organization, record=point
         )
@@ -157,7 +167,7 @@ class AsyncReadFetcher:
 
         async with session.get(self._dev_url) as response:
             if response.status != 200:
-                print(f"Error fetching data: {response.status}")
+                print(f'Error fetching data: {response.status}')
             else:
                 read = await response.json()
                 return read

@@ -10,7 +10,7 @@ from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 import pandas as pd
 
-__all__ = ["AsyncQuery"]
+__all__ = ['AsyncQuery']
 
 
 class AsyncQuery:
@@ -56,12 +56,13 @@ class AsyncQuery:
         self._influxdb_organization = org
         self._influxdb_bucket = bucket
 
-        self._db_url = f"http://{self._influxdb_host}:{self._influxdb_port}"
+        self._db_url = f'http://{self._influxdb_host}:{self._influxdb_port}'
 
         self.sensors = sensors
 
     async def _get_InfluxDB_client(self) -> InfluxDBClientAsync:
         """Returns an InfluxDB client."""
+
         return InfluxDBClientAsync(
             url=self._db_url,
             token=self._influxdb_token,
@@ -101,7 +102,7 @@ class AsyncQuery:
         Returns:
             pd.DataFrame: procured measurements as a DataFrame.
         """
-
+        print('into dataframe')
         read: dict = {}
         timestamps = set()
 
@@ -122,12 +123,12 @@ class AsyncQuery:
         local_timestamps = self._convert_to_local_time(timestamps)
 
         # if there is no time key, create one
-        if "time" not in read:
-            read["time"] = []
+        if 'time' not in read:
+            read['time'] = []
 
         # add the timestamps to the data dict
         for timestamp in local_timestamps:
-            read["time"].append(pd.to_datetime(timestamp))
+            read['time'].append(pd.to_datetime(timestamp))
 
         # return the data as a DataFrame
         return pd.DataFrame(read)
@@ -151,7 +152,7 @@ class AsyncQuery:
         try:
             tables = await query_api.query(query)
         except InfluxDBError as e:
-            print(f"Exception caught while querying the database:\n\n {e.message}")
+            print(f'Exception caught while querying the database:\n\n {e.message}')
 
         # close the connection
         await client.close()
@@ -185,7 +186,7 @@ class AsyncQuery:
         try:
             tables = await query_api.query(query)
         except InfluxDBError as e:
-            print(f"Exception caught while querying the database:\n\n {e.message}")
+            print(f'Exception caught while querying the database:\n\n {e.message}')
 
         await client.close()
 
@@ -212,7 +213,7 @@ class AsyncQuery:
         try:
             tables = await query_api.query(query)
         except InfluxDBError as e:
-            print(f"Exception caught while querying the database:\n\n {e.message}")
+            print(f'Exception caught while querying the database:\n\n {e.message}')
 
         await client.close()
 

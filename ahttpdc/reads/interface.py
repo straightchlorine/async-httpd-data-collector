@@ -12,7 +12,7 @@ import pandas as pd
 from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
 from ahttpdc.reads.query.async_query import AsyncQuery
 
-__all__ = ["DatabaseInterface"]
+__all__ = ['DatabaseInterface']
 
 
 class DatabaseInterface:
@@ -47,7 +47,7 @@ class DatabaseInterface:
     _db_url: str  # address of the influxdb instance
 
     def __init__(
-        self, host, port, token, org, bucket, sensors, dev_ip, dev_port, handle=""
+        self, host, port, token, org, bucket, sensors, dev_ip, dev_port, handle=''
     ):
         """
         Initialize the fetcher with the required information.
@@ -74,8 +74,8 @@ class DatabaseInterface:
         self._dev_port = dev_port
         self._dev_handle = handle
 
-        self._dev_url = f"http://{self._dev_ip}:{self._dev_port}/{self._dev_handle}"
-        self._db_url = f"http://{self._influxdb_host}:{self._influxdb_port}"
+        self._dev_url = f'http://{self._dev_ip}:{self._dev_port}/{self._dev_handle}'
+        self._db_url = f'http://{self._influxdb_host}:{self._influxdb_port}'
 
         self.sensors = sensors
 
@@ -100,6 +100,13 @@ class DatabaseInterface:
             self.sensors,
         )
 
+        def _start_fetching():
+            asyncio.run(self._fetcher.schedule_fetcher())
+
+        self.fetching_process = multiprocessing.Process(
+            target=_start_fetching, name='asyncfetcher'
+        )
+
     def enable_fetching(self):
         """
         Enable fetching from the device specified by dev_ip, dev_port and handle.
@@ -108,13 +115,15 @@ class DatabaseInterface:
         in order to avoid blocking the main thread.
         """
 
-        def _start_fetching():
-            asyncio.run(self._fetcher.schedule_fetcher())
+        self.fetching_process.start()
 
-        fetching_process = multiprocessing.Process(
-            target=_start_fetching, name="asyncfetcher"
-        )
-        fetching_process.start()
+    def disable_fetching(self):
+        """
+        Terminate fetching process.
+        """
+
+        self.fetching_process.terminate()
+        self.fetching_process.join()
 
     async def query_latest(self) -> pd.DataFrame:
         """
@@ -124,7 +133,7 @@ class DatabaseInterface:
             pd.DataFrame: The latest measurement.
         """
 
-        print("<.> querying latest measurement...")
+        print('<.> querying latest measurement...')
         query_task = asyncio.create_task(self.query_interface.latest())
         await query_task
         result = query_task.result()
@@ -142,7 +151,7 @@ class DatabaseInterface:
             pd.DataFrame: Historical data within the specified time range.
         """
 
-        print("<.> querying historical data...")
+        print('<.> querying historical data...')
         query_task = asyncio.create_task(
             self.query_interface.historical_data(start, end)
         )
@@ -161,7 +170,7 @@ class DatabaseInterface:
             pd.DataFrame: The result of the custom query.
         """
 
-        print("<.> custom query...")
+        print('<.> custom query...')
         query_task = asyncio.create_task(self.query_interface.query(query))
         await query_task
         result = query_task.result()
