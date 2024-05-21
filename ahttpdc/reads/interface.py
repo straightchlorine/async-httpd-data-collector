@@ -138,7 +138,7 @@ class DatabaseInterface:
         result = query_task.result()
         return result
 
-    async def query_historical(self, start: str, end: str) -> pd.DataFrame:
+    async def query_historical(self, start: str, end: str = '') -> pd.DataFrame:
         """
         Query historical data from the database.
 

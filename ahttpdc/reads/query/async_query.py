@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
+from influxdb_client import InfluxDBClient
 import pandas as pd
 
 __all__ = ['AsyncQuery']
@@ -96,11 +97,13 @@ class AsyncQuery:
 
     def _into_dataframe(self, tables) -> pd.DataFrame:
         """
-        Turns the tables into a pandas DataFrame.
+        Turns the tables into a pandas DataFrame with time of measurement as
+        as index.
+
         Args:
             tables (list): The tables to turn into a DataFrame.
         Returns:
-            pd.DataFrame: procured measurements as a DataFrame.
+            pd.DataFrame: procured measurements as a DataFrame sorted by time.
         """
         read: dict = {}
         timestamps = set()
@@ -129,8 +132,11 @@ class AsyncQuery:
         for timestamp in local_timestamps:
             read['time'].append(pd.to_datetime(timestamp))
 
-        # return the data as a DataFrame
-        return pd.DataFrame(read)
+        df = pd.DataFrame(read)
+        df.set_index('time', inplace=True)
+        df.sort_index(inplace=True)
+
+        return df
 
     async def latest(self) -> pd.DataFrame:
         """
@@ -162,35 +168,57 @@ class AsyncQuery:
         else:
             return pd.DataFrame()
 
-    async def historical_data(self, start: str, end: str) -> pd.DataFrame:
+    def historical_query(self, query: str) -> pd.DataFrame:
+        tables = None
+        try:
+            with InfluxDBClient(
+                url=self._db_url,
+                token=self._influxdb_token,
+                org=self._influxdb_organization,
+            ) as client:
+                query_api = client.query_api()
+                tables = query_api.query(query)
+        except InfluxDBError as e:
+            print(f'Exception caught while querying the database:\n\n {e.message}')
+
+        if tables is not None:
+            return self._into_dataframe(tables)
+        else:
+            return pd.DataFrame()
+
+    async def historical_data(self, start: str, end: str = '') -> pd.DataFrame:
         """
-        Query historical data from the database.
+        Query the database synchronously for historical data within the specified
+        range.
+        Query the database for historical data within the specified time range.
+        Use when dealing with large time intervals. Uses regular client, not the
+        async one.
 
         Args:
-            start (str): Start time of the query (e.g., '2024-01-01T00:00:00Z').
-            end (str): End time of the query (e.g., '2024-01-02T00:00:00Z').
+            start(str): start time (e.g., '2024-01-02T00:00:00Z') of the query
+                        or relative time string (e.g., '-30d') for end unspecified
+            end (str): End time of the query (e.g., '2024-01-02T00:00:00Z')
+
+        Example:
+            interface.historical_data('-30d')
+
+            finish = datetime.now()
+            start = finish - timedelta(minuts=30)
+            start = start.strftime('%Y-%m-%dT%H:%M:%SZ')
+            finish = finish.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+            interface.historical_data(start, finish)
 
         Returns:
             pd.DataFrame: Historical data within the specified time range.
         """
 
-        # get the connection to the database via query api
-        client = await self._get_InfluxDB_client()
-        query_api = client.query_api()
-
-        # query the data from specified start and finish
-        query = f'from(bucket:"{self._influxdb_bucket}") |> range(start: {start}, stop: {end})'
-
-        tables = None
-        try:
-            tables = await query_api.query(query)
-        except InfluxDBError as e:
-            print(f'Exception caught while querying the database:\n\n {e.message}')
-
-        await client.close()
-
-        if tables is not None:
-            return self._into_dataframe(tables)
+        if start is not None and end == '':
+            query = f'from(bucket:"{self._influxdb_bucket}") |> range(start: {start})'
+            return self.historical_query(query)
+        elif start is not None and end == '':
+            query = f'from(bucket:"{self._influxdb_bucket}") |> range(start: {start}, stop: {end})'
+            return self.historical_query(query)
         else:
             return pd.DataFrame()
 
