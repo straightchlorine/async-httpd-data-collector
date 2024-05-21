@@ -135,7 +135,6 @@ class AsyncReadFetcher:
             records (dict): The sensor readings as records for InfluxDB.
         """
 
-        print('<.> writing new read into database...')
         write_api = client.write_api()
         point = Point.from_dict(record, write_precision='ns')
         await write_api.write(
