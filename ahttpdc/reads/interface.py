@@ -133,13 +133,12 @@ class DatabaseInterface:
             pd.DataFrame: The latest measurement.
         """
 
-        print('<.> querying latest measurement...')
         query_task = asyncio.create_task(self.query_interface.latest())
         await query_task
         result = query_task.result()
         return result
 
-    async def query_historical(self, start: str, end: str) -> pd.DataFrame:
+    async def query_historical(self, start: str, end: str = '') -> pd.DataFrame:
         """
         Query historical data from the database.
 
@@ -151,7 +150,6 @@ class DatabaseInterface:
             pd.DataFrame: Historical data within the specified time range.
         """
 
-        print('<.> querying historical data...')
         query_task = asyncio.create_task(
             self.query_interface.historical_data(start, end)
         )
@@ -170,7 +168,6 @@ class DatabaseInterface:
             pd.DataFrame: The result of the custom query.
         """
 
-        print('<.> custom query...')
         query_task = asyncio.create_task(self.query_interface.query(query))
         await query_task
         result = query_task.result()
