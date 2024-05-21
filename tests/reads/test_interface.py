@@ -10,7 +10,7 @@ import os
 import pytest
 
 from ahttpdc.reads.interface import DatabaseInterface
-from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 
 from tests.reads.query.test_query import TestQuery
 
@@ -104,11 +104,8 @@ class TestInterface:
         self.set_up()
         await asyncio.sleep(5)
 
-        finish = datetime.now()
-        start = finish - timedelta(seconds=4)
-        result = await self.interface.query_historical(
-            start.strftime('%Y-%m-%dT%H:%M:%SZ'), finish.strftime('%Y-%m-%dT%H:%M:%SZ')
-        )
+        # the date variant tested in test_query.py
+        result = await self.interface.query_historical('-3s')
         self.interface.disable_fetching()
 
         assert not result.empty

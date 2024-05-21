@@ -216,7 +216,7 @@ class AsyncQuery:
         if start is not None and end == '':
             query = f'from(bucket:"{self._influxdb_bucket}") |> range(start: {start})'
             return self.historical_query(query)
-        elif start is not None and end == '':
+        elif start is not None and end != '':
             query = f'from(bucket:"{self._influxdb_bucket}") |> range(start: {start}, stop: {end})'
             return self.historical_query(query)
         else:
