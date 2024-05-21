@@ -102,7 +102,6 @@ class AsyncQuery:
         Returns:
             pd.DataFrame: procured measurements as a DataFrame.
         """
-        print('into dataframe')
         read: dict = {}
         timestamps = set()
 
