@@ -11,7 +11,6 @@ import multiprocessing
 import pytest
 
 from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
-# from tests.dev_server import DevelopmentServer
 
 
 class TestFetcher:
