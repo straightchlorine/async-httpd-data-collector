@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Example dashboard application using DatabaseInterface class.
 
@@ -8,19 +10,42 @@ import asyncio
 import json
 import multiprocessing
 
-from dash import Dash, Input, Output, callback, dcc, html
 import pandas as pd
 
 from ahttpdc.reads.interface import DatabaseInterface
-
-test_dev_ip = 'localhost'
-test_dev_port = 5000
+from dash import Dash, Input, Output, callback, dcc, html
 
 # load the secrets
 with open('secrets/secrets.json', 'r') as f:
     secrets = json.load(f)
 
-# list of sensors and the parameters they measure
+# define the sensors and parameters to fetch, according to the JSON response:
+# {
+#   "nodemcu": {
+#     "mq135": {
+#       "co": "2.56",
+#       "co2": "402.08",
+#       "alcohol": "0.94",
+#       "nh4": "3.30",
+#       "aceton": "0.32",
+#       "toulen": "0.38"
+#     },
+#     "bmp180": {
+#       "temperature": "28.60",
+#       "pressure": "1006.13",
+#       "seaLevelPressure": "1024.18",
+#       "altitude": "149.75"
+#     },
+#     "ds18b20": {
+#       "temperature": "27.00"
+#     },
+#     "dht22": {
+#       "temperature": "27.90",
+#       "humidity": "47.30"
+#     }
+#   }
+# }
+# response above is an example from my own setup.
 sensors = {
     'bmp180': ['altitude', 'pressure', 'temperature', 'seaLevelPressure'],
     'mq135': ['aceton', 'alcohol', 'co', 'co2', 'nh4', 'toulen'],
@@ -34,8 +59,8 @@ interface = DatabaseInterface(
     secrets['organization'],
     secrets['bucket'],
     sensors,
-    test_dev_ip,
-    test_dev_port,
+    secrets['dev_ip'],
+    secrets['dev_port'],
     secrets['handle'],
 )
 
@@ -52,7 +77,7 @@ dashboard_server = Dash(__name__)
 dashboard_server.layout = html.Div(
     html.Div(
         [
-            html.H4('NodeMCU Sensor Data'),
+            html.H4('Sensor Data'),
             html.Div(id='live-update-text'),
             dcc.Interval(id='interval-component', interval=1000, n_intervals=0),
         ]
@@ -99,11 +124,13 @@ def update_metrics(n):
         return [html.Span('probing data...')]
 
 
+# separate method to run server in a separate process
 def run():
     dashboard_server.scripts.config.serve_locally = True
     dashboard_server.run_server(port=8050, debug=False, processes=4, threaded=False)
 
 
+# run the server
 if __name__ == '__main__':
     interface.enable_fetching()
     server_process = multiprocessing.Process(target=run, name='dash')

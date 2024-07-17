@@ -11,6 +11,7 @@ mantainers = [
 ]
 description = "Gateway facilitating asyncronous communication between sensory data-emitting devices, InfluxDB and the user."
 readme = "README.md"
+readme-content-type = "text/markdown"
 license = {file = "LICENSE"}
 keywords = ['async', 'http', 'data', 'collector', 'influxdb', 'nodemcu', 'arduino', 'sensors', 'json']
 dynamic = ["version"]
@@ -44,7 +45,6 @@ classifiers = [
   "Topic :: Database",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Programming Language :: Python :: 3",
-
 ]
 
 [project.optional-dependencies]

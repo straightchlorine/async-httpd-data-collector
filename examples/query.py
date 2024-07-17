@@ -1,22 +1,54 @@
 #!/usr/bin/env python
+
+"""
+Example script, which queries data from the last 30 days and exports it to a
+csv file.
+
+Author: Piotr Krzysztof Lis - github.com/straightchlorine
+"""
+
 import json
 import asyncio
 import pandas as pd
 from ahttpdc.reads.interface import DatabaseInterface
 
 # load the secrets
-with open('secrets/rpi-secrets.json', 'r') as f:
+with open('secrets/secrets.json', 'r') as f:
     secrets = json.load(f)
 
+# define the sensors and parameters to fetch, according to the JSON response:
+# {
+#   "nodemcu": {
+#     "mq135": {
+#       "co": "2.56",
+#       "co2": "402.08",
+#       "alcohol": "0.94",
+#       "nh4": "3.30",
+#       "aceton": "0.32",
+#       "toulen": "0.38"
+#     },
+#     "bmp180": {
+#       "temperature": "28.60",
+#       "pressure": "1006.13",
+#       "seaLevelPressure": "1024.18",
+#       "altitude": "149.75"
+#     },
+#     "ds18b20": {
+#       "temperature": "27.00"
+#     },
+#     "dht22": {
+#       "temperature": "27.90",
+#       "humidity": "47.30"
+#     }
+#   }
+# }
+# response above is an example from my own setup.
 sensors = {
     'bmp180': ['altitude', 'pressure', 'seaLevelPressure'],
     'mq135': ['aceton', 'alcohol', 'co', 'co2', 'nh4', 'toulen'],
     'ds18b20': ['temperature'],
     'dht22': ['humidity'],
 }
-
-dev_ip = '192.168.10.101'
-dev_port = '80'
 
 # create the DatabaseInterface object
 interface = DatabaseInterface(
@@ -26,17 +58,19 @@ interface = DatabaseInterface(
     secrets['organization'],
     secrets['bucket'],
     sensors,
-    dev_ip,
-    dev_port,
+    sensors['dev_ip'],
+    sensors['dev_port'],
     secrets['handle'],
 )
 
 
+# query the data from the last 30 days
 async def query():
     result = await interface.query_historical('-30d')
     return result
 
 
+# run the query via asyncio
 if __name__ == '__main__':
     dataframe: pd.DataFrame = asyncio.run(query())
     dataframe.to_csv('sensor-data.csv')
