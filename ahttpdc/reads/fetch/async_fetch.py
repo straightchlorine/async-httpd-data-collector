@@ -9,6 +9,9 @@ import asyncio
 import datetime
 
 import aiohttp
+
+from ahttpdc.reads.fetch.parse.parser import JSONInfluxParser
+
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 from influxdb_client.client.write.point import Point
 
@@ -83,49 +86,6 @@ class AsyncReadFetcher:
 
         self._sensors = sensors
 
-    def _get_reads(self, data, device) -> dict[str, float]:
-        """
-        Based on sensors specified in sensors attribute fill the fields
-        with appropriate key-value pairs for InfluxDB storage.
-
-        Args:
-            data (dict): The sensor readings to parse.
-        """
-
-        fields = {}
-        for sensor in self._sensors:
-            for param in self._sensors[sensor]:
-                if param not in fields:
-                    fields[param] = float(data[device][sensor][param])
-                else:
-                    # if the measurement already has been recorded, calculate
-                    # the average of the measurements
-                    previous = fields[param]
-                    current = float(data[device][sensor][param])
-                    average = (previous + current) / 2
-                    fields[param] = average
-
-        return fields
-
-    def _parse_into_records(self, data):
-        """
-        Parse raw json file into records for InfluxDB.
-
-        Args:
-            data (dict): The sensor readings to parse.
-            device_name (str): The name of the device (default is 'nodemcu').
-        """
-
-        device = list(data.keys())[0]
-        records = {
-            'measurement': 'sensor_data',
-            'tags': {'device': device},
-            'timestamp': str(datetime.datetime.now()),
-        }
-
-        records['fields'] = self._get_reads(data, device)
-        return records
-
     async def _write_to_db(self, client, record):
         """
         Write the sensor readings to InfluxDB.
@@ -171,14 +131,17 @@ class AsyncReadFetcher:
                 read = await response.json()
                 return read
 
-    async def _request_and_store(self):
+    async def _request_and_store(self, parser: JSONInfluxParser):
         """
         Request sensor reading via aiohttp and store them in InfluxDB.
+
+        Args:
+            parser(JSONInfluxParser): parser
         """
 
         async with aiohttp.ClientSession() as session:
             json = await self._request_sensor_readings(session)
-            await self._store_sensor_readings(self._parse_into_records(json))
+            await self._store_sensor_readings(parser.parse(json))
 
     async def _fetching_loop(self):
         """
@@ -187,10 +150,10 @@ class AsyncReadFetcher:
         Loop is infinite and receives readings every second, meant to run in
         the background.
         """
-
+        parser = JSONInfluxParser(self._sensors)
         while True:
             await asyncio.sleep(1)
-            await self._request_and_store()
+            await self._request_and_store(parser)
 
     async def schedule_fetcher(self):
         """
