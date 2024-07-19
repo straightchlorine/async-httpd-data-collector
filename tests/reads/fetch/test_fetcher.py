@@ -10,7 +10,7 @@ import multiprocessing
 
 import pytest
 
-from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
+from ahttpdc.read.fetch.fetcher import AsyncReadFetcher
 
 
 class TestFetcher:

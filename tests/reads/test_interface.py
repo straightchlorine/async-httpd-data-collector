@@ -9,8 +9,7 @@ import os
 
 import pytest
 
-from ahttpdc.reads.interface import DatabaseInterface
-# from datetime import datetime, timedelta
+from ahttpdc.read.interface import DatabaseInterface
 
 from tests.reads.query.test_query import TestQuery
 

@@ -8,10 +8,7 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 import asyncio
 import aiohttp
 
-from ahttpdc.reads.fetch.parse.parser import JSONInfluxParser
-
-from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
-from influxdb_client.client.write.point import Point
+from ahttpdc.read.store.collector import AsyncCollector
 
 __all__ = ['AsyncReadFetcher']
 
@@ -84,36 +81,6 @@ class AsyncReadFetcher:
 
         self._sensors = sensors
 
-    async def _write_to_db(self, client, record):
-        """
-        Write the sensor readings to InfluxDB.
-
-        Args:
-            client (InfluxDBClientAsync): The InfluxDB client to write to.
-            records (dict): The sensor readings as records for InfluxDB.
-        """
-
-        write_api = client.write_api()
-        point = Point.from_dict(record, write_precision='ns')
-        await write_api.write(
-            bucket=self._influxdb_bucket, org=self._influxdb_organization, record=point
-        )
-
-    async def _store_sensor_readings(self, record):
-        """
-        Store sensor readings within InfluxDB.
-
-        Args:
-            records (dict): The sensor readings in the form of InfluxDB records.
-        """
-
-        async with InfluxDBClientAsync(
-            url=self._db_url,
-            token=self._influxdb_token,
-            org=self._influxdb_organization,
-        ) as client:
-            await self._write_to_db(client, record)
-
     async def _request_sensor_readings(self, session: aiohttp.ClientSession):
         """
         Fetch the sensor readings from the device via http request.
@@ -133,17 +100,23 @@ class AsyncReadFetcher:
                 read = await response.json()
                 return read
 
-    async def _request_and_store(self, parser: JSONInfluxParser):
+    async def _request_and_store(self):
         """
         Request sensor reading via aiohttp and store them in InfluxDB.
 
         Args:
             parser(JSONInfluxParser): parser
         """
-
+        collector = AsyncCollector(
+            self._sensors,
+            self._db_url,
+            self._influxdb_token,
+            self._influxdb_organization,
+            self._influxdb_bucket,
+        )
         async with aiohttp.ClientSession() as session:
             json = await self._request_sensor_readings(session)
-            await self._store_sensor_readings(parser.parse(json))
+            await collector.store_sensor_readings(json)
 
     async def _fetching_loop(self):
         """
@@ -152,10 +125,9 @@ class AsyncReadFetcher:
         Loop is infinite and receives readings every second, meant to run in
         the background.
         """
-        parser = JSONInfluxParser(self._sensors)
         while True:
             await asyncio.sleep(1)
-            await self._request_and_store(parser)
+            await self._request_and_store()
 
     async def schedule_fetcher(self):
         """

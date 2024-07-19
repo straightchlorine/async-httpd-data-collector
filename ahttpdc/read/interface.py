@@ -9,8 +9,8 @@ import multiprocessing
 
 import pandas as pd
 
-from ahttpdc.reads.fetch.async_fetch import AsyncReadFetcher
-from ahttpdc.reads.query.async_query import AsyncQuery
+from ahttpdc.read.fetch.fetcher import AsyncReadFetcher
+from ahttpdc.read.query.query import AsyncQuery
 
 __all__ = ['DatabaseInterface']
 
