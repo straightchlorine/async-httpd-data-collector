@@ -6,8 +6,6 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import asyncio
-import datetime
-
 import aiohttp
 
 from ahttpdc.reads.fetch.parse.parser import JSONInfluxParser
@@ -116,12 +114,16 @@ class AsyncReadFetcher:
         ) as client:
             await self._write_to_db(client, record)
 
-    async def _request_sensor_readings(self, session):
+    async def _request_sensor_readings(self, session: aiohttp.ClientSession):
         """
         Fetch the sensor readings from the device via http request.
 
         Args:
-            session: The aiohttp session to use for the request.
+            session(aiohttp.ClientSession): The aiohttp session to use for the request.
+
+        Returns:
+            dict: JSON response from the device.
+
         """
 
         async with session.get(self._dev_url) as response:
