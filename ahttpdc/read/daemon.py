@@ -4,11 +4,13 @@ Daemon facilitating continous fetching and storing.
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
-import multiprocessing
 import asyncio
+import multiprocessing
 
 from ahttpdc.read.fetch.fetcher import AsyncFetcher
 from ahttpdc.read.store.collector import AsyncCollector
+
+__all__ = ['DataDaemon']
 
 
 class DataDaemon:
