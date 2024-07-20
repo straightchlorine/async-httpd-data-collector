@@ -39,7 +39,7 @@ class AsyncCollector:
         self._org = db_org
         self._bucket = db_bucket
 
-    async def store_sensor_readings(self, json_response):
+    async def store_readings(self, json_response):
         """
         Store sensor readings within InfluxDB.
 
@@ -50,6 +50,7 @@ class AsyncCollector:
         record = self._parser.parse(json_response)
         point = Point.from_dict(record, write_precision='ms')
 
+        # writing created point into influx
         async with InfluxDBClientAsync(
             url=self._url,
             token=self._token,
