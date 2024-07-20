@@ -5,136 +5,63 @@ into InfluxDB as records.
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
-import asyncio
 import aiohttp
 
-from ahttpdc.read.store.collector import AsyncCollector
 
-__all__ = ['AsyncReadFetcher']
+__all__ = ['AsyncFetcher']
 
 
-class AsyncReadFetcher:
-    """
-    Manage fetching the readings from the sensor asyncronously via aiohttp and
-    handling received data so that it can be stored within InfluxDB.
+class AsyncFetcher:
+    """Asyncronously fetch JSON response from device providing readings.
+
+    TODO: Add some verification module to check if the JSON response is
+    appropriate for further processing, i.e. it follows:
+
+    {
+      "nodemcu": {
+        "mq135": {
+          "co": "2.56",
+          "co2": "402.08",
+          "alcohol": "0.94",
+          "nh4": "3.30",
+          "aceton": "0.32",
+          "toulen": "0.38"
+        },
+        "bmp180": {
+          "temperature": "28.60",
+          "pressure": "1006.13",
+          "seaLevelPressure": "1024.18",
+          "altitude": "149.75"
+        },
+        "ds18b20": {
+          "temperature": "27.00"
+        },
+        "dht22": {
+          "temperature": "27.90",
+          "humidity": "47.30"
+        }
+      }
+    }
 
     Attributes:
-        _influxdb_host (str): The host of the InfluxDB instance.
-        _influxdb_port (int): The port of the InfluxDB instance.
-        _influxdb_token (str): The token to authenticate with InfluxDB.
-        _influxdb_organization (str): The organization to use within InfluxDB.
-        _influxdb_bucket (str): InfluxDB bucket where the data will be stored.
-        _device_ip (str): The IP address of device providing sensor readings.
-        _device_port (str): The port of the device providing the readings.
-        _http_handle (str): The http handle to access the data.
-        _device_address (str): The address of the device in the network.
-        _database_address (str): The address of the InfluxDB instance.
-        _sensors (dict): Sensors attached to the device.
+        url (str): URL address of the device with data.
     """
 
-    _influxdb_host: str  # host of the influxdb instance
-    _influxdb_port: int  # port of the influxdb instance
-    _influxdb_token: str  # token to authenticate with influxdb
-    _influxdb_organization: str  # organization to use within influxdb
-    _influxdb_bucket: str  # bucket to save the data into
+    def __init__(self, url):
+        self._url = url
 
-    _dev_ip: str  # ip of the device sending the data
-    _dev_port: int  # port of the device sending the data
-    _dev_handle: str  # handle to access the data
-
-    _dev_url: str  # address of the device in the network
-    _db_url: str  # address of the influxdb instance
-
-    def __init__(
-        self, host, port, token, org, bucket, sensors, dev_ip, dev_port, handle=''
-    ):
+    async def request_readings(self):
         """
-        Initialize the fetcher with the required information.
+        Request JSON response from the server.
 
-        Args:
-            host (str): Host of the InfluxDB instance.
-            port (int): Port of the InfluxDB instance.
-            token (str): Token to authenticate with InfluxDB.
-            org (str): Organization to use within InfluxDB.
-            bucket (str): Bucket within InfluxDB where the data will be stored.
-            dev_ip (str):IP address of device providing sensor readings.
-            dev_port (str): Port of the device providing the readings.
-            handle (str): Http handle to access the data ("" by default).
-            sensors (dict): Which sensors device has and what do they measure.
-        """
-
-        # InfluxDB authentication data
-        self._influxdb_host = host
-        self._influxdb_port = port
-        self._influxdb_token = token
-        self._influxdb_organization = org
-        self._influxdb_bucket = bucket
-
-        # device identification
-        self._dev_ip = dev_ip
-        self._dev_port = dev_port
-        self._dev_handle = handle
-
-        # device and database URLs
-        self._dev_url = f'http://{self._dev_ip}:{self._dev_port}/{self._dev_handle}'
-        self._db_url = f'http://{self._influxdb_host}:{self._influxdb_port}'
-
-        self._sensors = sensors
-
-    async def _request_sensor_readings(self, session: aiohttp.ClientSession):
-        """
-        Fetch the sensor readings from the device via http request.
-
-        Args:
-            session(aiohttp.ClientSession): The aiohttp session to use for the request.
 
         Returns:
             dict: JSON response from the device.
-
         """
-
-        async with session.get(self._dev_url) as response:
-            if response.status != 200:
-                print(f'Error fetching data: {response.status}')
-            else:
-                read = await response.json()
-                return read
-
-    async def _request_and_store(self):
-        """
-        Request sensor reading via aiohttp and store them in InfluxDB.
-
-        Args:
-            parser(JSONInfluxParser): parser
-        """
-        collector = AsyncCollector(
-            self._sensors,
-            self._db_url,
-            self._influxdb_token,
-            self._influxdb_organization,
-            self._influxdb_bucket,
-        )
         async with aiohttp.ClientSession() as session:
-            json = await self._request_sensor_readings(session)
-            await collector.store_sensor_readings(json)
-
-    async def _fetching_loop(self):
-        """
-        Main fetcher loop to request and store sensor readings.
-
-        Loop is infinite and receives readings every second, meant to run in
-        the background.
-        """
-        while True:
-            await asyncio.sleep(1)
-            await self._request_and_store()
-
-    async def schedule_fetcher(self):
-        """
-        Create a task group managing the fetching loop.
-
-        Tested using asyncio.run()
-        """
-
-        async with asyncio.TaskGroup() as tg:
-            await tg.create_task(self._fetching_loop())
+            async with session.get(self._url) as response:
+                if response.status != 200:
+                    print(f'Error fetching data: {response.status}')
+                else:
+                    read = await response.json()
+                    return read
