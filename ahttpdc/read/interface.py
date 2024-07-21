@@ -1,5 +1,6 @@
-"""
-Interface that control both fetching, writing and querying from the database.
+"""Interface to communicate with the database.
+
+Manages fetching and collecting as well as querying.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
@@ -15,10 +16,9 @@ __all__ = ['DatabaseInterface']
 
 
 class DatabaseInterface:
-    """
-    Interface to control fetching, writing and querying from the database.
+    """Control fetching, writing and querying data.
 
-    Attributes:
+    Args:
         sensors (dict): The sensors and their parameters to read.
         db_host (str): The host of the InfluxDB instance.
         db_port (int): The port of the InfluxDB instance.
@@ -27,7 +27,11 @@ class DatabaseInterface:
         db_bucket (str): Bucket within InfluxDB where the data will be stored.
         srv_ip (str): The port of the device providing the readings.
         srv_port (str, optional): The http handle to access the data.
+            Defaults to 8000.
         handle (str, optional): The address of the device in the network.
+            Defaults to ''.
+        interval(int, optional): Interval between fetch-collect cycle.
+            Defaults to 1.
     """
 
     def __init__(
@@ -39,7 +43,7 @@ class DatabaseInterface:
         db_org: str,
         db_bucket: str,
         srv_ip: str,
-        srv_port: int,
+        srv_port: int = 8000,
         handle: str = '',
         interval: int = 1,
     ):
@@ -80,8 +84,7 @@ class DatabaseInterface:
         )
 
     async def query_latest(self) -> pd.DataFrame:
-        """
-        Query the latest measurement from the InfluxDB.
+        """Query the latest measurement from the InfluxDB.
 
         Returns:
             pd.DataFrame: The latest measurement.
@@ -92,15 +95,21 @@ class DatabaseInterface:
         return result
 
     async def query_historical(self, start: str, end: str = '') -> pd.DataFrame:
-        """
-        Query historical data from the database.
+        """Query historical data from the database.
 
         Args:
-            start (str): Start time of the query (e.g., '2024-01-01T00:00:00Z').
-            end (str): End time of the query (e.g., '2024-01-02T00:00:00Z').
+            start (str): Start of the time interval or a relative interval.
+            end (str, optional): End of the time interval. Defaults to ''
 
         Returns:
-            pd.DataFrame: Historical data within the specified time range.
+            pd.DataFrame: Data from selected time interval.
+
+        Examples:
+            Requires a time interval or relative interval to be passed.
+            * interval:
+                query_historical('2024-01-01T00:00:00Z', '2024-01-02T00:00:00Z')
+            * relative relative:
+                query_historical('-30d')
         """
         query_task = asyncio.create_task(
             self.query_interface.historical_data(start, end)
@@ -110,14 +119,13 @@ class DatabaseInterface:
         return result
 
     async def query(self, query: str) -> pd.DataFrame:
-        """
-        Perform a custom query on the database.
+        """Perform a custom query on the database.
 
         Args:
-            query (str): The InfluxDB query to execute.
+            query (str): The Flux query to execute.
 
         Returns:
-            pd.DataFrame: The result of the custom query.
+            pd.DataFrame: Response to the query.
         """
         query_task = asyncio.create_task(self.query_interface.query(query))
         await query_task

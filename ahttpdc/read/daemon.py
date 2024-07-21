@@ -1,5 +1,4 @@
-"""
-Daemon facilitating continous fetching and storing.
+"""Daemon facilitating continous data fetching and storing.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
@@ -23,7 +22,8 @@ class DataDaemon:
         db_org (str): Name of the InfluxDB organization
         db_bucket (str): Name of the InfluxDB bucket.
         srv_url (str): URL address of the server, handling JSON data.
-        interval (int): Interval between each fetch-collect cycle.
+        interval (int, optional): Interval between each fetch-collect cycle.
+            Defaults to 1.
     """
 
     def __init__(
@@ -39,16 +39,13 @@ class DataDaemon:
         self.sensors = sensors
         self.interval = interval
 
-        # influxdb
         self._db_url = db_url
         self._token = db_token
         self._org = db_org
         self._bucket = db_bucket
 
-        # server
         self._srv_url = srv_url
 
-        # objects
         self._fetcher = AsyncFetcher(self._srv_url)
         self._collector = AsyncCollector(
             self.sensors,

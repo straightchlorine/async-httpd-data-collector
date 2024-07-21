@@ -1,6 +1,33 @@
-"""
-Module asyncronously fetches the data from given device and writes the readings
-into InfluxDB as records.
+"""Asyncronously fetch data from server.
+
+Further processing requires JSON response to follow the convention beneath:
+
+    {
+      "nodemcu": {          # name of the server (arbitrary, unique)
+        "mq135": {          # name of the sensor providing measurements
+          "co": "2.56",     # measurements in key-value pairs
+          "co2": "402.08",
+          "alcohol": "0.94",
+          "nh4": "3.30",
+          "aceton": "0.32",
+          "toulen": "0.38"
+        },
+        "bmp180": {
+          "temperature": "28.60",
+          "pressure": "1006.13",
+          "seaLevelPressure": "1024.18",
+          "altitude": "149.75"
+        },
+        "ds18b20": {
+          "temperature": "27.00"
+        },
+        "dht22": {
+          "temperature": "27.90",
+          "humidity": "47.30"
+        }
+      }
+    }
+
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
@@ -43,7 +70,7 @@ class AsyncFetcher:
       }
     }
 
-    Attributes:
+    Args:
         url (str): URL address of the device with data.
     """
 
@@ -51,8 +78,7 @@ class AsyncFetcher:
         self._url = url
 
     async def request_readings(self):
-        """
-        Request JSON response from the server.
+        """Request JSON response from the server.
 
 
         Returns:
