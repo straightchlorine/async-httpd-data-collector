@@ -1,5 +1,4 @@
-"""
-Interface for passing queries to the database.
+"""Handle querying the database.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
@@ -15,12 +14,9 @@ __all__ = ['AsyncQuery']
 
 
 class AsyncQuery:
-    """
-    Interface to query the InfluxDB.
+    """Query the database.
 
-    Attributes:
-        _influxdb_host (str): The host of the InfluxDB instance.
-        _influxdb_port (int): The port of the InfluxDB instance.
+    Args:
         _influxdb_token (str): The token to authenticate with InfluxDB.
         _influxdb_organization (str): The organization to use within InfluxDB.
         _influxdb_bucket (str): Bucket within InfluxDB where the data will be stored.
@@ -28,46 +24,38 @@ class AsyncQuery:
         sensors_and_params (dict): The sensors and their parameters to read.
     """
 
-    _influxdb_host: str  # host of the influxdb instance
-    _influxdb_port: int  # port of the influxdb instance
-    _influxdb_token: str  # token to authenticate with influxdb
-    _influxdb_organization: str  # organization to use within influxdb
-    _influxdb_bucket: str  # bucket to save the data into
-
-    _db_url: str  # address of the influxdb instance
-
-    sensors: dict  # sensors and their parameters to read
-
-    def __init__(self, host, port, token, org, bucket, sensors):
-        """
-        Initialize the fetcher with the required information.
+    def __init__(
+        self,
+        sensors: dict[str, list[str]],
+        db_url: str,
+        db_token: str,
+        db_org: str,
+        db_bucket: str,
+    ):
+        """Interface for passing queries to the database.
 
         Args:
-            host (str): The host of the InfluxDB instance.
-            port (int): The port of the InfluxDB instance.
-            token (str): The token to authenticate with InfluxDB.
-            org (str): The organization to use within InfluxDB.
-            bucket (str): Bucket within InfluxDB where the data will be stored.
-            sensors (dict): The sensors and their parameters to read.
+            sensors (dict): Which sensors device has and what do they measure.
+            db_url (str): URL address of the server with database.
+            db_token (str): InfluxDB token to authenticate the user.
+            db_org (str): Name of the InfluxDB organization
+            db_bucket (str): Name of the InfluxDB bucket.
         """
 
-        self._influxdb_host = host
-        self._influxdb_port = port
-        self._influxdb_token = token
-        self._influxdb_organization = org
-        self._influxdb_bucket = bucket
-
-        self._db_url = f'http://{self._influxdb_host}:{self._influxdb_port}'
-
         self.sensors = sensors
+        self.db_url = db_url
 
-    async def _get_InfluxDB_client(self) -> InfluxDBClientAsync:
-        """Returns an InfluxDB client."""
+        self._token = db_token
+        self._org = db_org
+        self._bucket = db_bucket
+
+    async def _async_client(self) -> InfluxDBClientAsync:
+        """Helper funtion, provides ascyncronous InfluxDB client."""
 
         return InfluxDBClientAsync(
-            url=self._db_url,
-            token=self._influxdb_token,
-            org=self._influxdb_organization,
+            url=self.db_url,
+            token=self._token,
+            org=self._org,
         )
 
     def _convert_to_local_time(self, timestamps):
@@ -147,7 +135,7 @@ class AsyncQuery:
         """
 
         # get the connection to the database via query api
-        client = await self._get_InfluxDB_client()
+        client = await self._async_client()
         query_api = client.query_api()
 
         # query the latest measurement
@@ -232,7 +220,7 @@ class AsyncQuery:
         Returns:
             pd.DataFrame: The result of the custom query.
         """
-        client = await self._get_InfluxDB_client()
+        client = await self._async_client()
         query_api = client.query_api()
 
         tables = None
