@@ -1,16 +1,14 @@
 """Interface to communicate with the database.
 
-Manages fetching and collecting as well as querying.
+Manages appropriate objects and provides an interface for the user to utilise.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
-import asyncio
-
 import pandas as pd
 
 from ahttpdc.read.daemon import DataDaemon
-from ahttpdc.read.query.query import AsyncQuery
+from ahttpdc.read.query.interface import AsyncQuery
 
 __all__ = ['DatabaseInterface']
 
@@ -64,6 +62,7 @@ class DatabaseInterface:
 
         self.interval = interval
 
+        # daemon object (for fetching and writing)
         self.daemon = DataDaemon(
             self.sensors,
             self._db_url,
@@ -74,31 +73,31 @@ class DatabaseInterface:
             self.interval,
         )
 
-        self.query_interface = AsyncQuery(
-            self._db_host,
-            self._db_port,
+        # query object
+        self.query = AsyncQuery(
+            self.sensors,
+            self._db_url,
             self._db_token,
             self._db_org,
             self._db_bucket,
-            self.sensors,
         )
 
     async def query_latest(self) -> pd.DataFrame:
-        """Query the latest measurement from the InfluxDB.
+        """Query the latest measurement from InfluxDB.
 
         Returns:
             pd.DataFrame: The latest measurement.
         """
-        query_task = asyncio.create_task(self.query_interface.latest())
-        await query_task
-        result = query_task.result()
-        return result
+        return await self.query.latest()
 
-    async def query_historical(self, start: str, end: str = '') -> pd.DataFrame:
+    async def query_historical(
+        self, start_relative: str, end: str = ''
+    ) -> pd.DataFrame:
         """Query historical data from the database.
 
         Args:
-            start (str): Start of the time interval or a relative interval.
+            start_relative (str): Start of the time interval or a relative
+                interval.
             end (str, optional): End of the time interval. Defaults to ''
 
         Returns:
@@ -107,18 +106,14 @@ class DatabaseInterface:
         Examples:
             Requires a time interval or relative interval to be passed.
             * interval:
-                query_historical('2024-01-01T00:00:00Z', '2024-01-02T00:00:00Z')
+                query_historical('2024-01-01T00:00:00Z',
+                    '2024-01-02T00:00:00Z')
             * relative relative:
                 query_historical('-30d')
         """
-        query_task = asyncio.create_task(
-            self.query_interface.historical_data(start, end)
-        )
-        await query_task
-        result = query_task.result()
-        return result
+        return await self.query.historical(start_relative, end)
 
-    async def query(self, query: str) -> pd.DataFrame:
+    async def query_custom(self, query: str) -> pd.DataFrame:
         """Perform a custom query on the database.
 
         Args:
@@ -127,7 +122,4 @@ class DatabaseInterface:
         Returns:
             pd.DataFrame: Response to the query.
         """
-        query_task = asyncio.create_task(self.query_interface.query(query))
-        await query_task
-        result = query_task.result()
-        return result
+        return await self.query.custom(query)
