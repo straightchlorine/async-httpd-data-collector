@@ -3,10 +3,10 @@
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
-from ahttpdc.read.store.parse.parser import JSONInfluxParser
-
-from influxdb_client.client.write.point import Point
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
+from influxdb_client.client.write.point import Point
+
+from ahttpdc.read.store.parse.parser import JSONInfluxParser
 
 
 class AsyncCollector:

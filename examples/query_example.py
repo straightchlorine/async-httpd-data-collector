@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 """
-Example script, which enables process of fetching and storing data to the
-InfluxDB database.
+Example script, which queries data from the last 30 days and exports it to a
+csv file.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import json
-from ahttpdc.reads.interface import DatabaseInterface
+import pandas as pd
+from ahttpdc.read.database_interface import DatabaseInterface
 
 # load the secrets
 with open('secrets/secrets.json', 'r') as f:
@@ -50,16 +51,20 @@ sensors = {
 
 # create the DatabaseInterface object
 interface = DatabaseInterface(
+    sensors,
     secrets['host'],
     secrets['port'],
     secrets['token'],
     secrets['organization'],
     secrets['bucket'],
-    sensors,
-    secrets['dev_ip'],
-    secrets['dev_port'],
+    secrets['srv_ip'],
+    secrets['srv_port'],
     secrets['handle'],
+    1,
 )
 
+
+# run the query via asyncio
 if __name__ == '__main__':
-    interface.enable_fetching()
+    dataframe: pd.DataFrame = interface.query_historical('-1d')
+    dataframe.to_csv('sensor-data.csv')

@@ -8,7 +8,7 @@ import asyncio
 import os
 import pytest
 
-from ahttpdc.read.interface import DatabaseInterface
+from ahttpdc.read.database_interface import DatabaseInterface
 
 
 class TestInterface:

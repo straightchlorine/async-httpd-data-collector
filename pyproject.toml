@@ -86,14 +86,10 @@ path = "ahttpdc/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["ahttpdc"]
 
-[tool.ruff.lint]
-select = ["E4", "E7", "E9", "F", "B"]
-ignore = ["E501"]
-unfixable = ["B"]
-
-[tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["E402"]
-"**/{tests,docs,tools}/*" = ["E402"]
+[tool.ruff]
+line-length = 79
 
 [tool.ruff.format]
 quote-style = "single"
+indent-style = "space"
+docstring-code-format = true

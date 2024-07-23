@@ -6,6 +6,7 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import pandas as pd
+import asyncio
 
 from ahttpdc.read.daemon import DataDaemon
 from ahttpdc.read.query.interface import AsyncQuery
@@ -14,7 +15,16 @@ __all__ = ['DatabaseInterface']
 
 
 class DatabaseInterface:
-    """Control fetching, writing and querying data.
+    """Control data-daemon and querying data.
+
+    Attributes:
+        daemon (DataDaemon): Object manages the process of fetching and
+            collecting data.
+
+    You can enable data-daemon like this:
+
+        interface = DatabaseInterface(args)
+        interface.daemon.enable()
 
     Args:
         sensors (dict): The sensors and their parameters to read.
@@ -41,11 +51,11 @@ class DatabaseInterface:
         db_org: str,
         db_bucket: str,
         srv_ip: str,
-        srv_port: int = 8000,
+        srv_port: int | str = 8000,
         handle: str = '',
         interval: int = 1,
     ):
-        self.sensors = sensors
+        self._sensors = sensors
 
         self._db_host = db_host
         self._db_port = db_port
@@ -60,37 +70,38 @@ class DatabaseInterface:
         self._handle = handle
         self._srv_url = f'http://{self._ip}:{self._port}/{self._handle}'
 
-        self.interval = interval
+        self._interval = interval
 
-        # daemon object (for fetching and writing)
         self.daemon = DataDaemon(
-            self.sensors,
+            self._sensors,
             self._db_url,
             self._db_token,
             self._db_org,
             self._db_bucket,
             self._srv_url,
-            self.interval,
+            self._interval,
         )
 
         # query object
-        self.query = AsyncQuery(
-            self.sensors,
+        self._query = AsyncQuery(
+            self._sensors,
             self._db_url,
             self._db_token,
             self._db_org,
             self._db_bucket,
         )
 
-    async def query_latest(self) -> pd.DataFrame:
+    def query_latest(self) -> pd.DataFrame:
         """Query the latest measurement from InfluxDB.
 
         Returns:
             pd.DataFrame: The latest measurement.
         """
-        return await self.query.latest()
+        loop = asyncio.get_event_loop()
+        task = asyncio.create_task(self._query.latest())
+        return loop.run_until_complete(task)
 
-    async def query_historical(
+    def query_historical(
         self, start_relative: str, end: str = ''
     ) -> pd.DataFrame:
         """Query historical data from the database.
@@ -111,10 +122,16 @@ class DatabaseInterface:
             * relative relative:
                 query_historical('-30d')
         """
-        return await self.query.historical(start_relative, end)
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(
+            self._query.historical(start_relative, end)
+        )
 
-    async def query_custom(self, query: str) -> pd.DataFrame:
-        """Perform a custom query on the database.
+    def query_custom_async(self, query: str) -> pd.DataFrame:
+        """Perform a custom asyncronous query on the database.
+
+        Note: Use it for queries that you are certain provide small amounts of
+        data. Otherwise, if you can have problems with unclosed sessions.
 
         Args:
             query (str): The Flux query to execute.
@@ -122,4 +139,21 @@ class DatabaseInterface:
         Returns:
             pd.DataFrame: Response to the query.
         """
-        return await self.query.custom(query)
+        loop = asyncio.get_event_loop()
+        task = asyncio.create_task(self._query.custom_async(query))
+        return loop.run_until_complete(task)
+
+    def query_custom_sync(self, query: str) -> pd.DataFrame:
+        """Perform a custom syncronous query on the database.
+
+        Note: For large queries.
+
+        Args:
+            query (str): The Flux query to execute.
+
+        Returns:
+            pd.DataFrame: Response to the query.
+        """
+        loop = asyncio.get_event_loop()
+        task = asyncio.create_task(self._query.custom_sync(query))
+        return loop.run_until_complete(task)

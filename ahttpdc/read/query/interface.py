@@ -6,6 +6,7 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.flux_table import TableList
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
+from influxdb_client.client.influxdb_client import InfluxDBClient
 import pandas as pd
 
 from ahttpdc.read.query.parse.data import DataParser
@@ -52,7 +53,45 @@ class AsyncQuery:
             org=self._org,
         )
 
-    async def custom(self, query: str) -> pd.DataFrame:
+    async def _client(self) -> InfluxDBClient:
+        """Helper funtion, provides ascyncronous InfluxDB client."""
+
+        return InfluxDBClient(
+            url=self.db_url,
+            token=self._token,
+            org=self._org,
+        )
+
+    async def custom_sync(self, query: str) -> pd.DataFrame:
+        """Pass to the database given query.
+
+        Returns:
+            pd.DataFrame: Response to the given query.
+        """
+        tables: TableList = TableList()
+        try:
+            # secure the connection
+            client = await self._client()
+            query_api = client.query_api()
+
+            # query the database
+            tables = query_api.query(query)
+
+            # close the connection
+            client.close()
+
+        except InfluxDBError as e:
+            print(f'Exception while querying the database:\n\n{e.message}')
+
+        parser = DataParser(tables)
+        return parser.into_dataframe()
+
+    async def custom_async(self, query: str) -> pd.DataFrame:
+        """Pass to the database given query.
+
+        Returns:
+            pd.DataFrame: Response to the given query.
+        """
         tables: TableList = TableList()
         try:
             # secure the connection
@@ -78,7 +117,7 @@ class AsyncQuery:
             pd.DataFrame: The latest measurement of every parameter.
         """
         query = f'from(bucket:"{self._bucket}") |> range(start: -1h) |> last()'
-        return await self.custom(query)
+        return await self.custom_async(query)
 
     async def historical(self, start: str, end: str = '') -> pd.DataFrame:
         """Query historical data from the database.
@@ -99,12 +138,14 @@ class AsyncQuery:
                 query_historical('-30d')
         """
         try:
+            # TODO: experiment a bit and try to do it asyncronously if possible
+            # tried futures
             if start is not None and end == '':
-                return await self.custom(
+                return await self.custom_sync(
                     f'from(bucket:"{self._bucket}") |> range(start: {start})'
                 )
             elif start is not None and end != '':
-                return await self.custom(
+                return await self.custom_sync(
                     (
                         f'from(bucket:"{self._bucket}")'
                         f' |> range(start: {start}, stop: {end})'

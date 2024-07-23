@@ -56,11 +56,10 @@ class DataDaemon:
         )
 
         def _daemon_coroutine():
-            """Helper method to send asyncio coroutine to another process.
+            """Helper method to send asyncio coroutine to another process."""
 
-            TODO: Create a proper process queue for this process and ensure
-            elegant shutdown of the coroutine along with mantaining results.
-            """
+            # TODO: Create a proper process queue for this process and ensure
+            # elegant shutdown of the coroutine along with mantaining results.
             asyncio.run(self._schedule_daemon())
 
         self._data_daemon = multiprocessing.Process(

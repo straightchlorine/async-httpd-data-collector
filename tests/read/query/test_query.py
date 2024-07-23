@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import os
 import pytest
 
-from ahttpdc.read.interface import DataDaemon
+from ahttpdc.read.daemon import DataDaemon
 from ahttpdc.read.query.interface import AsyncQuery
 
 

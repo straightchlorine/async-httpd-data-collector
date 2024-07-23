@@ -12,7 +12,7 @@ import multiprocessing
 
 import pandas as pd
 
-from ahttpdc.reads.interface import DatabaseInterface
+from ahttpdc.read.database_interface import DatabaseInterface
 from dash import Dash, Input, Output, callback, dcc, html
 
 # load the secrets
@@ -53,15 +53,16 @@ sensors = {
 
 # create the DatabaseInterface object
 interface = DatabaseInterface(
+    sensors,
     secrets['host'],
     secrets['port'],
     secrets['token'],
     secrets['organization'],
     secrets['bucket'],
-    sensors,
-    secrets['dev_ip'],
-    secrets['dev_port'],
+    secrets['srv_ip'],
+    secrets['srv_port'],
     secrets['handle'],
+    1,
 )
 
 
@@ -79,7 +80,9 @@ dashboard_server.layout = html.Div(
         [
             html.H4('Sensor Data'),
             html.Div(id='live-update-text'),
-            dcc.Interval(id='interval-component', interval=1000, n_intervals=0),
+            dcc.Interval(
+                id='interval-component', interval=1000, n_intervals=0
+            ),
         ]
     )
 )
@@ -87,7 +90,8 @@ dashboard_server.layout = html.Div(
 
 # live updating the text
 @callback(
-    Output('live-update-text', 'children'), Input('interval-component', 'n_intervals')
+    Output('live-update-text', 'children'),
+    Input('interval-component', 'n_intervals'),
 )
 def update_metrics(n):
     measurement_dataframe: pd.DataFrame = asyncio.run(update_data())
@@ -111,7 +115,8 @@ def update_metrics(n):
             html.Span('Pressure: {0:.2f}'.format(pressure), style=style),
             html.Span('Temperature: {0:.2f}'.format(temperature), style=style),
             html.Span(
-                'Sea Level Pressure: {0:.2f}'.format(sea_level_pressure), style=style
+                'Sea Level Pressure: {0:.2f}'.format(sea_level_pressure),
+                style=style,
             ),
             html.Span('Aceton: {0:.2f}'.format(aceton), style=style),
             html.Span('Alcohol: {0:.2f}'.format(alcohol), style=style),
@@ -127,7 +132,9 @@ def update_metrics(n):
 # separate method to run server in a separate process
 def run():
     dashboard_server.scripts.config.serve_locally = True
-    dashboard_server.run_server(port=8050, debug=False, processes=4, threaded=False)
+    dashboard_server.run_server(
+        port=8050, debug=False, processes=4, threaded=False
+    )
 
 
 # run the server

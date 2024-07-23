@@ -1,32 +1,5 @@
 """Parse JSON response into records compatible with InfluxDB.
 
-    JSON should fit following convention:
-    {
-      "nodemcu": {          # name of the device
-        "mq135": {          # sensor, managed by the device
-          "co": "2.56",     # measured parameters
-          "co2": "402.08",
-          "alcohol": "0.94",
-          "nh4": "3.30",
-          "aceton": "0.32",
-          "toulen": "0.38"
-        },
-        "bmp180": {
-          "temperature": "28.60",
-          "pressure": "1006.13",
-          "seaLevelPressure": "1024.18",
-          "altitude": "149.75"
-        },
-        "ds18b20": {
-          "temperature": "27.00"
-        },
-        "dht22": {
-          "temperature": "27.90",
-          "humidity": "47.30"
-        }
-      }
-    }
-
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
@@ -110,7 +83,8 @@ class JSONInfluxParser:
 
         For example: multiple temperature readings from 3 sensors and all of
         them are selected via sensors dictionary.
-        Take it into the account, if you have dedicated sensors for a specific
+
+        Take it into account, if you have dedicated sensors for a specific
         parameters. In such case other utilities might simply make the readings
         less accurate than they could have been otherwise.
 
