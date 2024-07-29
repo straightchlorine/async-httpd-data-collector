@@ -7,8 +7,8 @@ This class facilitates the communication between the fetcher and the querying ap
 
 In order to control fetching, there are two methods:
 
-* `interface.enable_fetching()`;
-* `interface.disable_fetching()`.
+* `interface.daemon.enableg()`;
+* `interface.daemon.disable()`.
 
 Those methods control the thread within which fetching process is contained.
 

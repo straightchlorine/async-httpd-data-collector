@@ -63,4 +63,4 @@ interface = DatabaseInterface(
 )
 
 if __name__ == '__main__':
-    interface.enable_fetching()
+    interface.daemon.enable()

@@ -69,7 +69,7 @@ interface = DatabaseInterface(
 # data update task
 async def update_data():
     # get the data
-    data = await interface.query_latest()
+    data = interface.query_latest()
     return data
 
 
@@ -139,6 +139,6 @@ def run():
 
 # run the server
 if __name__ == '__main__':
-    interface.enable_fetching()
+    interface.daemon.enable()
     server_process = multiprocessing.Process(target=run, name='dash')
     server_process.start()
