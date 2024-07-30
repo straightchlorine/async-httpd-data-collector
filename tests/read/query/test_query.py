@@ -111,7 +111,7 @@ class TestAsyncQuery:
 
         # wait for some data to flow in
         self.set_up()
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
         self.daemon.disable()
 
         result = await self.query.latest()

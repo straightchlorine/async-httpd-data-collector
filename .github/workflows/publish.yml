@@ -1,38 +1,55 @@
-name: Publish Python Package
+---
+# Builds, relases and publishes to PyPi
+# .github/workflows/publish.yml
+name: CD
+
+# triggered when testing is finished
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["CI"]
+    branches: [master]
+    types:
+      - completed
+
+# add contents: write for the release
+permissions:
+  contents: write
+
 jobs:
-  build-and-publish:
+
+  build-release-publish:
     runs-on: ubuntu-latest
+
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install build twine
           pip install -r requirements.txt
+
       - name: Build the application
         run: |
           python -m build
-      - name: Publish to PyPi
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          python -m twine upload dist/*
+
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            dist/*
+            dist/**
+
+      - name: Publish to PyPi
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |-
+          python -m twine upload dist/*

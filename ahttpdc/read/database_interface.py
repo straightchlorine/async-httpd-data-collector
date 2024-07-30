@@ -51,7 +51,7 @@ class DatabaseInterface:
         db_org: str,
         db_bucket: str,
         srv_ip: str,
-        srv_port: int | str = 8000,
+        srv_port: int | str = 80,
         handle: str = '',
         interval: int = 1,
     ):
