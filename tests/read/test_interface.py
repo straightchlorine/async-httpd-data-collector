@@ -80,7 +80,7 @@ class TestInterface:
         """
 
         self.set_up()
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         self.interface.daemon.disable()
 
         assert True

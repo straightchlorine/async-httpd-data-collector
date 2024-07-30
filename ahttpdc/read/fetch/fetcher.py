@@ -60,7 +60,7 @@ class AsyncFetcher:
                     print(f'Error fetching data: {response.status}')
                 else:
                     # TODO: Add some verification module to check if the JSON response is
-                    # appropriate for further processing, i.e. it follows:
+                    # appropriate for further processing.
 
                     read = await response.json()
                     return read
