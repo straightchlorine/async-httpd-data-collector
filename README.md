@@ -3,11 +3,6 @@
 [![PyPI version](https://badge.fury.io/py/async-httpd-data-collector.svg)](https://pypi.org/project/async-httpd-data-collector/)
 [![Total Downloads](https://static.pepy.tech/badge/async-httpd-data-collector)](https://pepy.tech/project/async-httpd-data-collector)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/async-httpd-data-collector)](https://pypi.org/project/async-httpd-data-collector/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![CI](https://github.com/straightchlorine/async-httpd-data-collector/actions/workflows/test.yml/badge.svg)](https://github.com/straightchlorine/async-httpd-data-collector/actions/workflows/test.yml)
-
-[Documentation](https://ahttpdc-docs.codextechnologies.org/mkdocs)
-
 </div>
 
 # async-httpd-data-collector
@@ -118,7 +113,3 @@ df = interface.query_custom_sync('from(bucket:"my-bucket") |> range(start: -1d) 
 - [air-quality-data-analysis](https://github.com/straightchlorine/air-quality-data-analysis) -
   Jupyter notebooks with data analysis (heatmaps, correlations, anomaly detection)
   and SARIMAX time-series forecasting on the collected data
-
-## License
-
-[GNU General Public License v3](LICENSE)
