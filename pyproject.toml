@@ -6,10 +6,10 @@ build-backend = "hatchling.build"
 authors = [
   {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
 ]
-mantainers = [
+maintainers = [
   {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
 ]
-description = "Gateway facilitating asyncronous communication between sensory data-emitting devices, InfluxDB and the user."
+description = "Gateway facilitating asynchronous communication between sensory data-emitting devices, InfluxDB and the user."
 readme = "README.md"
 readme-content-type = "text/markdown"
 license = {file = "LICENSE"}
@@ -19,25 +19,13 @@ name = "async-httpd-data-collector"
 requires-python = ">=3.8"
 dependencies = [
   "influxdb-client[async]",
-  "reactivex",
-  "certifi",
-  "python-dateutil",
-  "setuptools",
-  "urllib3",
   "aiohttp",
   "aiocsv",
-  "typing_extensions",
-  "aiosignal",
-  "attrs",
-  "frozenlist",
-  "multidict",
-  "yarl",
-  "six",
-  "idna",
   "pandas",
   "numpy",
+  "reactivex",
+  "python-dateutil",
   "pytz",
-  "tzdata",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -51,32 +39,18 @@ classifiers = [
 test = [
   "pytest",
   "pytest-asyncio",
-  "iniconfig",
-  "pluggy",
   "dash",
   "Flask",
-  "Werkzeug",
   "plotly",
-  "dash-html-components",
-  "dash-core-components",
-  "dash-table",
-  "importlib_metadata",
   "requests",
-  "retrying",
-  "Jinja2",
-  "nest-asyncio",
-  "itsdangerous",
-  "click",
-  "blinker",
-  "tenacity",
-  "MarkupSafe",
-  "packaging",
-  "zipp",
-  "charset-normalizer",
+]
+docs = [
+  "mkdocs-material",
 ]
 
 
 [project.urls]
+Documentation = "https://ahttpdc-docs.codextechnologies.org/mkdocs"
 Repository = "https://github.com/straightchlorine/async-httpd-data-collector"
 Issues = "https://github.com/straightchlorine/async-httpd-data-collector/issues"
 

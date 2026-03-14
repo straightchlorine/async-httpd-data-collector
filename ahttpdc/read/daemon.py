@@ -1,4 +1,4 @@
-"""Daemon facilitating continous data fetching and storing.
+"""Daemon facilitating continuous data fetching and storing.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
@@ -13,7 +13,7 @@ __all__ = ['DataDaemon']
 
 
 class DataDaemon:
-    """Background process managing asyncronous data fetching and collecting.
+    """Background process managing asynchronous data fetching and collecting.
 
     Args:
         sensors (dict): Which sensors device has and what do they measure.
@@ -59,7 +59,7 @@ class DataDaemon:
             """Helper method to send asyncio coroutine to another process."""
 
             # TODO: Create a proper process queue for this process and ensure
-            # elegant shutdown of the coroutine along with mantaining results.
+            # elegant shutdown of the coroutine along with maintaining results.
             asyncio.run(self._schedule_daemon())
 
         self._data_daemon = multiprocessing.Process(

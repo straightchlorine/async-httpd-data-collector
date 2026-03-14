@@ -28,7 +28,7 @@ jobs:
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # install InfluxDB CLI to authenticate access to the database
       - name: Install InfluxDB CLI
@@ -56,8 +56,8 @@ jobs:
             --force
 
           # save the data required for the token generation and testing
-          echo "::set-output name=org::${INFLUX_ORG}"
-          echo "::set-output name=bucket::${INFLUX_BUCKET}"
+          echo "org=${INFLUX_ORG}" >> $GITHUB_OUTPUT
+          echo "bucket=${INFLUX_BUCKET}" >> $GITHUB_OUTPUT
 
       - name: Generate token for further authentication
         id: auth
@@ -72,10 +72,10 @@ jobs:
             --json | jq '.token')
 
           # save the token
-          echo "::set-output name=token::${INFLUX_TOKEN}"
+          echo "token=${INFLUX_TOKEN}" >> $GITHUB_OUTPUT
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -92,7 +92,7 @@ jobs:
       - name: Test
         run: |-
 
-          # run the falsk dev_server
+          # run the flask dev_server
           export FLASK_APP="tests/dev_server"
           flask run --host=0.0.0.0 --port=9000 &
           sleep 5

@@ -1,4 +1,4 @@
-"""Asyncronously fetch data from server.
+"""Asynchronously fetch data from server.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
@@ -10,7 +10,7 @@ __all__ = ['AsyncFetcher']
 
 
 class AsyncFetcher:
-    """Asyncronously fetch JSON response from device providing readings.
+    """Asynchronously fetch JSON response from device providing readings.
 
     Note: For further processing following JSON structure is required:
     {

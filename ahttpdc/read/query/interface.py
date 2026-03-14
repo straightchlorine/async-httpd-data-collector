@@ -45,7 +45,7 @@ class AsyncQuery:
         self._bucket = db_bucket
 
     async def _async_client(self) -> InfluxDBClientAsync:
-        """Helper funtion, provides ascyncronous InfluxDB client."""
+        """Helper function, provides asynchronous InfluxDB client."""
 
         return InfluxDBClientAsync(
             url=self.db_url,
@@ -54,7 +54,7 @@ class AsyncQuery:
         )
 
     async def _client(self) -> InfluxDBClient:
-        """Helper funtion, provides ascyncronous InfluxDB client."""
+        """Helper function, provides synchronous InfluxDB client."""
 
         return InfluxDBClient(
             url=self.db_url,
@@ -138,7 +138,7 @@ class AsyncQuery:
                 query_historical('-30d')
         """
         try:
-            # TODO: experiment a bit and try to do it asyncronously if possible
+            # TODO: experiment a bit and try to do it asynchronously if possible
             # tried futures
             if start is not None and end == '':
                 return await self.custom_sync(

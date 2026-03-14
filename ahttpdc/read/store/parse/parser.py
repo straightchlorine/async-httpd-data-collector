@@ -7,7 +7,7 @@ import datetime
 
 
 class JSONInfluxParser:
-    """Parse JSON reponse into records for InfluxDB.
+    """Parse JSON response into records for InfluxDB.
 
     Required JSON structure:
     {
@@ -48,7 +48,7 @@ class JSONInfluxParser:
         """Parse measured parameters from JSON response to a dictionary.
 
         Sensors dictionary defines which parameters will be stored in the
-        databse. In case of multiple readings of the same parameter,
+        database. In case of multiple readings of the same parameter,
         the average is calculated.
 
 

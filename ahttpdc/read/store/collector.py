@@ -10,7 +10,7 @@ from ahttpdc.read.store.parse.parser import JSONInfluxParser
 
 
 class AsyncCollector:
-    """Store the data asyncronously within InfluxDB.
+    """Store the data asynchronously within InfluxDB.
 
     Args:
         sensors (dict[str, list[str]]): readings to store from each sensor.
@@ -39,12 +39,12 @@ class AsyncCollector:
     async def store_readings(self, json_response):
         """Store sensor readings within InfluxDB.
 
-        JSON reponse is parsed, decorated and stored in InfluxDB.
+        JSON response is parsed, decorated and stored in InfluxDB.
 
         Args:
             records (dict): The sensor readings as InfluxDB record.
         """
-        # crating the time-series point out of the record
+        # creating the time-series point out of the record
         record = self._parser.parse(json_response)
         point = Point.from_dict(record, write_precision='ms')
 

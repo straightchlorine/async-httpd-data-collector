@@ -128,7 +128,7 @@ class DatabaseInterface:
         )
 
     def query_custom_async(self, query: str) -> pd.DataFrame:
-        """Perform a custom asyncronous query on the database.
+        """Perform a custom asynchronous query on the database.
 
         Note: Use it for queries that you are certain provide small amounts of
         data. Otherwise, if you can have problems with unclosed sessions.
@@ -144,7 +144,7 @@ class DatabaseInterface:
         return loop.run_until_complete(task)
 
     def query_custom_sync(self, query: str) -> pd.DataFrame:
-        """Perform a custom syncronous query on the database.
+        """Perform a custom synchronous query on the database.
 
         Note: For large queries.
 
