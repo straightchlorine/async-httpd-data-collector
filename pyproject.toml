@@ -50,7 +50,7 @@ docs = [
 
 
 [project.urls]
-Documentation = "https://ahttpdc-docs.codextechnologies.org/mkdocs"
+Documentation = "https://docs.ahttpdc.piotrkrzysztof.dev/"
 Repository = "https://github.com/straightchlorine/async-httpd-data-collector"
 Issues = "https://github.com/straightchlorine/async-httpd-data-collector/issues"
 
