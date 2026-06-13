@@ -42,7 +42,7 @@ This gives about 341 training samples and 85 test samples (in hours).
 Autocorrelation (ACF) and partial autocorrelation (PACF) plots were used
 to determine the order parameters for each SARIMAX model.
 
-![ACF/PACF plots](https://ahttpdc-docs.codextechnologies.org/mkdocs/acf_pacf.png)
+![ACF/PACF plots](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/acf_pacf.png)
 
 Here's where the first problem shows up. All three parameters
 (temperature, pressure, humidity) have almost no significant
@@ -82,7 +82,7 @@ certainly leads to overfitting.
 
 ## Results
 
-![SARIMAX predictions](https://ahttpdc-docs.codextechnologies.org/mkdocs/sarimax_predictions.png)
+![SARIMAX predictions](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/sarimax_predictions.png)
 
 The left column shows the full observed data with predictions overlaid
 (red dashed line marks the train/test split). The right column zooms

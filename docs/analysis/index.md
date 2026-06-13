@@ -38,25 +38,25 @@ The main analysis notebook covers:
 Temporal distribution of temperature, humidity, pressure, and CO2.
 Midnight boundaries are marked to show daily patterns.
 
-![Temperature heatmap](https://ahttpdc-docs.codextechnologies.org/mkdocs/heatmap_temperature.png)
+![Temperature heatmap](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/heatmap_temperature.png)
 
 The temperature heatmap shows the readings are tightly clustered around
 24-25C with very little daily variation. This makes sense for a
 climate-controlled indoor environment. The gap around Jun 1 is a data
 collection interruption (likely the device was restarted or lost WiFi).
 
-![Humidity heatmap](https://ahttpdc-docs.codextechnologies.org/mkdocs/heatmap_humidity.png)
+![Humidity heatmap](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/heatmap_humidity.png)
 
 Humidity shows more spread (roughly 42-52%) and some visible banding -
 likely from daily patterns like cooking, opening windows, etc.
 
-![Pressure heatmap](https://ahttpdc-docs.codextechnologies.org/mkdocs/heatmap_pressure.png)
+![Pressure heatmap](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/heatmap_pressure.png)
 
 Pressure has the most natural variation (990-1006 hPa) and shows clear
 weather-driven patterns. This is the one parameter where outdoor
 conditions are directly visible even indoors.
 
-![CO2 heatmap](https://ahttpdc-docs.codextechnologies.org/mkdocs/heatmap_co2.png)
+![CO2 heatmap](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/heatmap_co2.png)
 
 The CO2 heatmap is worth taking with a grain of salt. The MQ135 is a
 cheap gas sensor not really designed for precise CO2 measurement - it's
@@ -69,7 +69,7 @@ suggesting the sensor mostly reads baseline. The few higher readings
 
 Distribution of key environmental parameters.
 
-![Histograms](https://ahttpdc-docs.codextechnologies.org/mkdocs/histograms.png)
+![Histograms](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/histograms.png)
 
 Temperature and pressure show roughly normal distributions. The humidity
 histogram has a spiky appearance - the DHT22 sensor reports humidity in
@@ -81,7 +81,7 @@ comb pattern. The CO2 histogram again shows the tight clustering around
 
 Relationships between temperature, humidity, and pressure.
 
-![Correlation matrix](https://ahttpdc-docs.codextechnologies.org/mkdocs/correlation_matrix.png)
+![Correlation matrix](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/correlation_matrix.png)
 
 Almost no correlation between any of the parameters (-0.2 to 0). This
 is expected for a controlled indoor environment over just two weeks -
@@ -95,9 +95,9 @@ and humidity tend to be inversely correlated outdoors).
 Pressure vs humidity and pressure vs temperature, with linear
 regression trendlines.
 
-![Pressure vs temperature](https://ahttpdc-docs.codextechnologies.org/mkdocs/scatter_pressure_vs_temperature.png)
+![Pressure vs temperature](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/scatter_pressure_vs_temperature.png)
 
-![Pressure vs humidity](https://ahttpdc-docs.codextechnologies.org/mkdocs/scatter_pressure_vs_humidity.png)
+![Pressure vs humidity](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/scatter_pressure_vs_humidity.png)
 
 The scatter plots confirm what the correlation matrix shows - no
 meaningful linear relationship between these parameters in this
@@ -108,9 +108,9 @@ dataset. The data forms tight clusters rather than trends.
 Temperature, humidity, and pressure over time with 24-hour rolling
 averages to smooth out noise.
 
-![Time series of environmental factors](https://ahttpdc-docs.codextechnologies.org/mkdocs/timeseries_environmental.png)
+![Time series of environmental factors](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/timeseries_environmental.png)
 
-![Time series rolling means](https://ahttpdc-docs.codextechnologies.org/mkdocs/timeseries_rolling.png)
+![Time series rolling means](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/timeseries_rolling.png)
 
 The subplot layout is a bit cramped in the static export (titles
 overlap axis labels). In the original interactive notebook these
@@ -123,7 +123,7 @@ over the two-week period.
 CO2, CO, alcohol, acetone, toluene, and NH4 readings over time
 with rolling means.
 
-![Gas concentrations](https://ahttpdc-docs.codextechnologies.org/mkdocs/gas_concentrations.png)
+![Gas concentrations](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/gas_concentrations.png)
 
 All MQ135 readings are nearly flat lines. This is a known limitation
 of the MQ135 - it needs proper calibration in a controlled environment
@@ -145,7 +145,7 @@ What could improve this:
 Z-score based outlier detection (threshold: 3 standard deviations)
 across all parameters.
 
-![Anomaly detection](https://ahttpdc-docs.codextechnologies.org/mkdocs/anomaly_detection.png)
+![Anomaly detection](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/anomaly_detection.png)
 
 With such stable indoor data, very few points exceed 3 standard
 deviations. The detected outliers are mostly sensor noise rather than
@@ -159,13 +159,13 @@ STL (Seasonal and Trend decomposition using Loess) for temperature,
 humidity, pressure, and CO2 - showing trend, seasonal, and residual
 components.
 
-![Seasonal decomposition - temperature](https://ahttpdc-docs.codextechnologies.org/mkdocs/seasonal_decomposition_temperature.png)
+![Seasonal decomposition - temperature](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/seasonal_decomposition_temperature.png)
 
-![Seasonal decomposition - humidity](https://ahttpdc-docs.codextechnologies.org/mkdocs/seasonal_decomposition_humidity.png)
+![Seasonal decomposition - humidity](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/seasonal_decomposition_humidity.png)
 
-![Seasonal decomposition - pressure](https://ahttpdc-docs.codextechnologies.org/mkdocs/seasonal_decomposition_pressure.png)
+![Seasonal decomposition - pressure](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/seasonal_decomposition_pressure.png)
 
-![Seasonal decomposition - CO2](https://ahttpdc-docs.codextechnologies.org/mkdocs/seasonal_decomposition_co2.png)
+![Seasonal decomposition - CO2](https://docs.ahttpdc.piotrkrzysztof.dev/mkdocs/seasonal_decomposition_co2.png)
 
 The decomposition works best for pressure, where there's a visible
 trend component reflecting weather changes. Temperature and humidity
