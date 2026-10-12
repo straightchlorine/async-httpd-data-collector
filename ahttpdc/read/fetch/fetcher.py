@@ -5,7 +5,6 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 
 import aiohttp
 
-
 __all__ = ['AsyncFetcher']
 
 
@@ -54,7 +53,8 @@ class AsyncFetcher:
         Returns:
             dict: JSON response from the device.
         """
-        async with aiohttp.ClientSession() as session:
+        # parenthesized `with` needs 3.9, package supports 3.8
+        async with aiohttp.ClientSession() as session:  # noqa: SIM117
             async with session.get(self._url) as response:
                 if response.status != 200:
                     print(f'Error fetching data: {response.status}')

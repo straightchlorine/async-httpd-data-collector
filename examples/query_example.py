@@ -8,7 +8,9 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import json
+
 import pandas as pd
+
 from ahttpdc.read.database_interface import DatabaseInterface
 
 # load the secrets

@@ -3,10 +3,12 @@ Test class for AsyncQuery.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
+from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta
 import os
+from datetime import datetime, timedelta
+
 import pytest
 
 from ahttpdc.read.daemon import DataDaemon

@@ -3,11 +3,13 @@
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
+from __future__ import annotations
+
+import pandas as pd
 from influxdb_client.client.exceptions import InfluxDBError
 from influxdb_client.client.flux_table import TableList
-from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 from influxdb_client.client.influxdb_client import InfluxDBClient
-import pandas as pd
+from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 
 from ahttpdc.read.query.parse.data import DataParser
 
@@ -146,10 +148,8 @@ class AsyncQuery:
                 )
             elif start is not None and end != '':
                 return await self.custom_sync(
-                    (
-                        f'from(bucket:"{self._bucket}")'
-                        f' |> range(start: {start}, stop: {end})'
-                    )
+                    f'from(bucket:"{self._bucket}")'
+                    f' |> range(start: {start}, stop: {end})'
                 )
             else:
                 raise InvalidInterval()

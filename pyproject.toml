@@ -64,6 +64,10 @@ packages = ["ahttpdc"]
 [tool.ruff]
 line-length = 79
 
+[tool.ruff.lint]
+# DTZ005: naive timestamps are stored;
+ignore = ["DTZ005"]
+
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"

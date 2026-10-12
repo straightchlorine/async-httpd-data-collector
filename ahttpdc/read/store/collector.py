@@ -2,6 +2,7 @@
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
+from __future__ import annotations
 
 from influxdb_client.client.influxdb_client_async import InfluxDBClientAsync
 from influxdb_client.client.write.point import Point

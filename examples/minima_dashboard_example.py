@@ -11,9 +11,9 @@ import json
 import multiprocessing
 
 import pandas as pd
+from dash import Dash, Input, Output, callback, dcc, html
 
 from ahttpdc.read.database_interface import DatabaseInterface
-from dash import Dash, Input, Output, callback, dcc, html
 
 # load the secrets
 with open('secrets/secrets.json', 'r') as f:
@@ -110,20 +110,20 @@ def update_metrics(n):
         toulen = measurement_dataframe['toulen'].iloc[-1]
         style = {'padding': '5px', 'fontSize': '16px'}
         return [
-            html.Span('Time: {0}'.format(time), style=style),
-            html.Span('Altitude: {0:.2f}'.format(altitude), style=style),
-            html.Span('Pressure: {0:.2f}'.format(pressure), style=style),
-            html.Span('Temperature: {0:.2f}'.format(temperature), style=style),
+            html.Span(f'Time: {time}', style=style),
+            html.Span(f'Altitude: {altitude:.2f}', style=style),
+            html.Span(f'Pressure: {pressure:.2f}', style=style),
+            html.Span(f'Temperature: {temperature:.2f}', style=style),
             html.Span(
-                'Sea Level Pressure: {0:.2f}'.format(sea_level_pressure),
+                f'Sea Level Pressure: {sea_level_pressure:.2f}',
                 style=style,
             ),
-            html.Span('Aceton: {0:.2f}'.format(aceton), style=style),
-            html.Span('Alcohol: {0:.2f}'.format(alcohol), style=style),
-            html.Span('CO: {0:.2f}'.format(co), style=style),
-            html.Span('CO2: {0:.2f}'.format(co2), style=style),
-            html.Span('NH4: {0:.2f}'.format(nh4), style=style),
-            html.Span('Toulen: {0:.2f}'.format(toulen), style=style),
+            html.Span(f'Aceton: {aceton:.2f}', style=style),
+            html.Span(f'Alcohol: {alcohol:.2f}', style=style),
+            html.Span(f'CO: {co:.2f}', style=style),
+            html.Span(f'CO2: {co2:.2f}', style=style),
+            html.Span(f'NH4: {nh4:.2f}', style=style),
+            html.Span(f'Toulen: {toulen:.2f}', style=style),
         ]
     else:
         return [html.Span('probing data...')]

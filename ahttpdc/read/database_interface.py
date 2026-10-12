@@ -4,9 +4,11 @@ Manages appropriate objects and provides an interface for the user to utilise.
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
+from __future__ import annotations
+
+import asyncio
 
 import pandas as pd
-import asyncio
 
 from ahttpdc.read.daemon import DataDaemon
 from ahttpdc.read.query.interface import AsyncQuery

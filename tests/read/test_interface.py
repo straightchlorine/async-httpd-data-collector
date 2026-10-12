@@ -6,6 +6,7 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 
 import asyncio
 import os
+
 import pytest
 
 from ahttpdc.read.database_interface import DatabaseInterface

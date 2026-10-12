@@ -2,6 +2,7 @@
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
+from __future__ import annotations
 
 import asyncio
 import multiprocessing

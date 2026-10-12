@@ -2,6 +2,7 @@
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
+from __future__ import annotations
 
 import datetime
 
@@ -97,7 +98,7 @@ class JSONInfluxParser:
         """
 
         # device name in the first json key
-        device = list(json_measurements.keys())[0]
+        device = next(iter(json_measurements))
         records = {
             'measurement': 'sensor_data',
             'tags': {'device': device},

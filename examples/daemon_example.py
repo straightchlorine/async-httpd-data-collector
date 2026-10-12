@@ -8,6 +8,7 @@ Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
 
 import json
+
 from ahttpdc.read.database_interface import DatabaseInterface
 
 # load the secrets

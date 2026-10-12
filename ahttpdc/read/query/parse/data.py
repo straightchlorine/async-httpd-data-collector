@@ -2,11 +2,12 @@
 
 Author: Piotr Krzysztof Lis - github.com/straightchlorine
 """
+from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from influxdb_client.client.flux_table import TableList
 import pandas as pd
+from influxdb_client.client.flux_table import TableList
 
 
 class DataParser:

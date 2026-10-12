@@ -4,11 +4,16 @@
 
 name: CI
 
-# trigger on push to the master
+# trigger on push to the master and on version tags (tags also publish)
 on:
   push:
     branches:
       - master
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   continuous-integration:
@@ -82,7 +87,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff build twine
+          pip install ruff==0.16.10 build twine
           pip install -r requirements.txt
 
       - name: Check formatting
@@ -105,3 +110,41 @@ jobs:
           export INFLUXDB_ORG=${{steps.setup-influx.outputs.org}}
           export INFLUXDB_BUCKET=${{steps.setup-influx.outputs.bucket}}
           pytest
+
+  # builds, releases and publishes to PyPI once CI is green on a tag
+  publish:
+    needs: continuous-integration
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build the package
+        run: |
+          python -m build
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/**
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |-
+          python -m twine upload dist/*
