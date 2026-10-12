@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 authors = [
-  {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
+  {name = 'Piotr Krzysztof', email = 'piotr@codextechnologies.org'}
 ]
 maintainers = [
-  {name = 'Piotr Krzysztof Lis', email = 'piotrlis555@gmail.com'}
+  {name = 'Piotr Krzysztof', email = 'piotr@codextechnologies.org'}
 ]
 description = "Gateway facilitating asynchronous communication between sensory data-emitting devices, InfluxDB and the user."
 readme = "README.md"
@@ -53,6 +53,7 @@ docs = [
 Documentation = "https://docs.ahttpdc.piotrkrzysztof.dev/"
 Repository = "https://github.com/straightchlorine/async-httpd-data-collector"
 Issues = "https://github.com/straightchlorine/async-httpd-data-collector/issues"
+Author = "https://piotrkrzysztof.dev"
 
 [tool.hatch.version]
 path = "ahttpdc/__init__.py"

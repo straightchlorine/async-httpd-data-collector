@@ -1,3 +1,8 @@
+---
+title: API Reference for Classes
+description: "Reference for DatabaseInterface, DataDaemon, AsyncFetcher, AsyncQuery, JSONInfluxParser and DataParser: constructor arguments, methods and return types."
+---
+
 # API Reference
 
 ## DatabaseInterface
@@ -171,7 +176,7 @@ Query the last measurement from the past hour.
 
 [Source](https://github.com/straightchlorine/async-httpd-data-collector/blob/master/ahttpdc/read/query/interface.py#L122)
 
-Query a time range. Uses the sync client internally for large result sets.
+Query a time range. Always runs through the sync client internally.
 
 #### `async custom_async(query) -> pd.DataFrame`
 
@@ -191,7 +196,9 @@ Execute a custom Flux query via the synchronous client.
 
 [Source](https://github.com/straightchlorine/async-httpd-data-collector/blob/master/ahttpdc/read/query/interface.py#L17)
 
-Raised when `historical()` receives invalid time parameters.
+Raised internally when `historical()` gets no start time. It is caught
+there: the method prints a message and returns an empty DataFrame, so
+callers do not see the exception.
 
 ---
 
@@ -211,7 +218,7 @@ Parse raw JSON into an InfluxDB record with measurement, tags,
 timestamp, and fields.
 
 If the same parameter appears in multiple sensors, the values are
-averaged.
+averaged pairwise, in the order the sensors are listed.
 
 ---
 
@@ -228,4 +235,6 @@ Converts InfluxDB query results into pandas DataFrames.
 [Source](https://github.com/straightchlorine/async-httpd-data-collector/blob/master/ahttpdc/read/query/parse/data.py#L43)
 
 Parse FluxTable results into a DataFrame indexed by local time.
-Timestamps are converted from UTC to your local timezone.
+Timestamps are shifted from UTC by the machine's current UTC offset (a
+fixed shift, not a per-timestamp timezone conversion, so readings from
+before a DST change are off by an hour).

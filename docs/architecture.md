@@ -1,3 +1,8 @@
+---
+title: Architecture and Data Flow
+description: "How the library moves data from a NodeMCU sensor board to InfluxDB and back: fetcher, parser, collector and query classes, package layout and dependencies."
+---
+
 # Architecture
 
 ## Overview
@@ -51,7 +56,7 @@ Returns the raw JSON response as a Python dict.
 
 Takes the raw JSON from the device and converts it into an InfluxDB
 record (measurement name, tags, timestamp, fields). Handles the case
-where multiple sensors measure the same parameter by averaging.
+where multiple sensors measure the same parameter by averaging pairwise, in the order the sensors are listed.
 
 [Source](https://github.com/straightchlorine/async-httpd-data-collector/blob/master/ahttpdc/read/store/parse/parser.py#L9)
 
@@ -65,9 +70,10 @@ Writes parsed records to InfluxDB as time-series Points using the
 ### AsyncQuery
 
 Queries InfluxDB using Flux and returns results via `DataParser`.
-Supports both async and sync InfluxDB clients. The sync client is
-used for large historical queries (to avoid session timeout issues
-with the async client).
+Supports both async and sync InfluxDB clients. `latest()` and
+`custom_async()` use the async client. `historical()` and
+`custom_sync()` always use the sync client (to avoid session timeout
+issues with the async client).
 
 [Source](https://github.com/straightchlorine/async-httpd-data-collector/blob/master/ahttpdc/read/query/interface.py#L21)
 
@@ -122,11 +128,15 @@ to `GET /circumstances` with the JSON structure described in
 
 ## Dependencies
 
-Core runtime dependencies:
+Dependencies declared in `pyproject.toml`:
 
 - `influxdb-client[async]` - InfluxDB client with async support
 - `aiohttp` - async HTTP client for fetching device data
 - `pandas` + `numpy` - data manipulation and DataFrame support
 - `reactivex` - required by influxdb-client
 - `python-dateutil` + `pytz` - timezone handling
-- `aiocsv` - async CSV support
+- `aiocsv` - listed, but not imported by the package code
+
+`numpy` is also not imported directly; it is installed with `pandas`.
+`python-dateutil`, `pytz` and `reactivex` are not imported directly either;
+they are listed in `pyproject.toml`, and `influxdb-client` depends on some of them.

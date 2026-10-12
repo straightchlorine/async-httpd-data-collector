@@ -1,3 +1,8 @@
+---
+title: Async IoT Sensor Collector
+description: Python library that fetches JSON sensor readings from a NodeMCU over HTTP with asyncio, stores them in InfluxDB, and queries them back as pandas DataFrames.
+---
+
 <p align="center">
   <a href="https://pypi.org/project/async-httpd-data-collector/">
     <img src="https://badge.fury.io/py/async-httpd-data-collector.svg" alt="PyPI version">

@@ -1,3 +1,8 @@
+---
+title: SARIMAX Sensor Forecasting
+description: SARIMAX forecasts of temperature, pressure and humidity from sensor data, with ACF/PACF analysis, parameter choices, weak results, and what would work better.
+---
+
 # Forecasting
 
 Time-series forecasting on the sensor data using SARIMAX

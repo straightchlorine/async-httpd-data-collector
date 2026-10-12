@@ -1,3 +1,8 @@
+---
+title: Installation and Usage Guide
+description: Install async-httpd-data-collector, define your sensors, start the daemon, query InfluxDB into pandas, export to CSV, and load credentials from a JSON file.
+---
+
 # Getting Started
 
 ## Installation
@@ -10,6 +15,7 @@ pip install async-httpd-data-collector
 
 You need:
 
+- Python 3.11 or newer (the daemon uses `asyncio.TaskGroup`)
 - A device serving sensor data as JSON over HTTP (see
   [arduino-air-state-server](https://github.com/straightchlorine/arduino-air-state-server)
   for the reference implementation)
@@ -65,7 +71,9 @@ sensors = {
 
 !!! note
     If the same parameter appears in multiple sensors (like `temperature`
-    from both BMP180 and DS18B20), the library averages the readings.
+    from both BMP180 and DS18B20), the library averages the readings pairwise in the order the
+    sensors are listed: with two sensors that is the plain mean, with three
+    the last one counts for half.
     Keep this in mind if you want readings from a specific sensor -
     include that parameter only for that sensor.
 
@@ -124,7 +132,7 @@ df = interface.query_custom_sync(
 ```
 
 All query methods return a `pandas.DataFrame` with timestamps converted
-to your local timezone.
+by your machine's current UTC offset.
 
 ### 5. Export to CSV
 

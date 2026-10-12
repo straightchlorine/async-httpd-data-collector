@@ -113,3 +113,11 @@ df = interface.query_custom_sync('from(bucket:"my-bucket") |> range(start: -1d) 
 - [air-quality-data-analysis](https://github.com/straightchlorine/air-quality-data-analysis) -
   Jupyter notebooks with data analysis (heatmaps, correlations, anomaly detection)
   and SARIMAX time-series forecasting on the collected data
+
+---
+
+<div align="center">
+
+To the only God, be honour and glory for ever and ever.
+
+</div>

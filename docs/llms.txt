@@ -1,0 +1,21 @@
+# async-httpd-data-collector
+
+> Python library that collects sensor readings from a NodeMCU board over HTTP and stores them in InfluxDB.
+
+The library fetches and parses sensor data asynchronously and provides query helpers for the stored series. These docs cover setup, the API, the architecture, an analysis of the collected sensor data and a SARIMAX forecasting attempt.
+
+## Docs
+
+- [Async IoT Sensor Collector](https://docs.ahttpdc.piotrkrzysztof.dev/): Python library that fetches JSON sensor readings from a NodeMCU over HTTP with asyncio, stores them in InfluxDB, and queries them back as pandas DataFrames.
+- [Sensor Data Analysis Overview](https://docs.ahttpdc.piotrkrzysztof.dev/analysis/): Notebook analysis of two weeks of air-quality readings: heatmaps, histograms, correlations, rolling means, gas levels, anomaly detection and decomposition.
+- [SARIMAX Sensor Forecasting](https://docs.ahttpdc.piotrkrzysztof.dev/analysis/prediction/): SARIMAX forecasts of temperature, pressure and humidity from sensor data, with ACF/PACF analysis, parameter choices, weak results, and what would work better.
+- [API Reference for Classes](https://docs.ahttpdc.piotrkrzysztof.dev/api/): Reference for DatabaseInterface, DataDaemon, AsyncFetcher, AsyncQuery, JSONInfluxParser and DataParser: constructor arguments, methods and return types.
+- [Architecture and Data Flow](https://docs.ahttpdc.piotrkrzysztof.dev/architecture/): How the library moves data from a NodeMCU sensor board to InfluxDB and back: fetcher, parser, collector and query classes, package layout and dependencies.
+- [Installation and Usage Guide](https://docs.ahttpdc.piotrkrzysztof.dev/getting-started/): Install async-httpd-data-collector, define your sensors, start the daemon, query InfluxDB into pandas, export to CSV, and load credentials from a JSON file.
+
+## Optional
+
+- [Source repository](https://github.com/straightchlorine/async-httpd-data-collector): code, issues and releases
+- [Author](https://piotrkrzysztof.dev/): Piotr Krzysztof Lis
+
+To the only God, be honour and glory for ever and ever.

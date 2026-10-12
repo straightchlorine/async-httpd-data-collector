@@ -1,3 +1,8 @@
+---
+title: Sensor Data Analysis Overview
+description: "Notebook analysis of two weeks of air-quality readings: heatmaps, histograms, correlations, rolling means, gas levels, anomaly detection and decomposition."
+---
+
 # Data Analysis
 
 The collected sensor data was analyzed in Jupyter notebooks as part of
